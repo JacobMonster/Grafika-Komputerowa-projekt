@@ -15,6 +15,9 @@
 #include <assimp/postprocess.h>
 #include <string>
 
+#include <thread>
+#include <chrono>
+
 
 namespace texture {
 	GLuint earth;
@@ -36,7 +39,32 @@ Core::Shader_Loader shaderLoader;
 
 Core::RenderContext shipContext;
 Core::RenderContext sphereContext;
+
 Core::RenderContext checkpointContext;
+Core::RenderContext place1Context;
+Core::RenderContext s2Context;
+Core::RenderContext s3Context;
+
+// Checkpoint positions
+const int numCheckpoints = 5;
+std::vector<glm::vec3> checkpointPos = {
+	glm::vec3(0.0f, 1.0f, 4.0f),
+	glm::vec3(0.0f, 1.0f, 8.0f),
+	glm::vec3(0.0f, 1.0f, 12.0f),
+	glm::vec3(0.0f, 1.0f, 16.0f),
+	glm::vec3(0.0f, 1.0f, 20.0f)
+};
+
+int currentCheckpointIndex = 0;
+
+bool reachedCheckpoint = false;
+
+std::vector<glm::vec3> colors = {
+	glm::vec3(1.0f, 1.0f, 0.0f),
+	glm::vec3(1.0f, 0.0f, 0.0f)
+};
+
+int colorIndex = 0;
 
 glm::vec3 cameraPos = glm::vec3(-4.f, 0, 0);
 glm::vec3 cameraDir = glm::vec3(1.f, 0.f, 0.f);
@@ -50,7 +78,6 @@ glm::vec3 Bot2Pos = glm::vec3(-2.0f, 1.0f, -2.0f);
 glm::vec3 Bot1Dir = glm::normalize(glm::vec3(0.354510f, 0.000000f, 0.935054f));
 glm::vec3 Bot2Dir = glm::normalize(glm::vec3(-0.354510f, 0.000000f, 0.935054f));
 
-glm::vec3 checkpointPos = glm::vec3(0.0f, 1.0f, 4.0f);
 //glm::vec3 checkpointDir = glm::vec3(0.0f, 1.0f, 0.0f);
 
 GLuint VAO, VBO;
@@ -184,9 +211,15 @@ void renderScene(GLFWwindow* window)
 		glm::vec3(0.3, 0.3, 0.5)
 	);
 
-	// Checkpoint 1
+	// Checkpoint 0
 	drawObjectColor(checkpointContext,
-		glm::translate(checkpointPos),
+		glm::translate(checkpointPos[currentCheckpointIndex]),
+		colors[colorIndex]
+	);
+
+	// 1st place
+	drawObjectColor(place1Context,
+		glm::translate(glm::vec3(-20.f, -20.0f, -20.0f)),
 		glm::vec3(1.0, 1.0, 0.0)
 	);
 
@@ -233,6 +266,9 @@ void init(GLFWwindow* window)
 	loadModelToContext("./models/sphere.obj", sphereContext);
 	loadModelToContext("./models/spaceship.obj", shipContext);
 	loadModelToContext("./models/checkpoint.obj", checkpointContext);
+	loadModelToContext("./models/place1.obj", place1Context);
+	loadModelToContext("./models/s2.obj", s2Context);
+	loadModelToContext("./models/s3.obj", s3Context);
 
 	texture::earth = Core::LoadTexture("textures/earth.png");
 	texture::moon = Core::LoadTexture("textures/moon.jpg");
@@ -255,25 +291,85 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		spaceshipPos += spaceshipDir * moveSpeed;
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		spaceshipPos -= spaceshipDir * moveSpeed;
-	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
-		spaceshipPos += spaceshipSide * moveSpeed;
-	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
-		spaceshipPos -= spaceshipSide * moveSpeed;
-	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
-		spaceshipPos += spaceshipUp * moveSpeed;
-	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
-		spaceshipPos -= spaceshipUp * moveSpeed;
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		spaceshipDir = glm::vec3(glm::eulerAngleY(angleSpeed) * glm::vec4(spaceshipDir, 0));
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		spaceshipDir = glm::vec3(glm::eulerAngleY(-angleSpeed) * glm::vec4(spaceshipDir, 0));
 
-	cameraPos = spaceshipPos - 1.5 * spaceshipDir + glm::vec3(0, 1, 0) * 0.5f;
-	cameraDir = spaceshipDir;
+	// Coordinates
+	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+	{
+		std::cout << "Spaceship Position: (" << spaceshipPos.x << ", " << spaceshipPos.y << ", " << spaceshipPos.z << ")\n";
+		std::cout << "Spaceship Direction: (" << spaceshipDir.x << ", " << spaceshipDir.y << ", " << spaceshipDir.z << ")\n";
+	}
+
+	// Checkpoint 0
+	if (spaceshipPos.x > -1.0f && spaceshipPos.x < 1.0f &&
+		spaceshipPos.y > -1.26f && spaceshipPos.y < 1.9f &&
+		spaceshipPos.z > 3.9f && spaceshipPos.z < 4.1f &&
+		currentCheckpointIndex == 0)
+	{
+		currentCheckpointIndex = 1;
+	}
+
+	// Checkpoint 1
+	if (spaceshipPos.x > -1.0f && spaceshipPos.x < 1.0f &&
+		spaceshipPos.y > -1.26f && spaceshipPos.y < 1.9f &&
+		spaceshipPos.z > 7.9f && spaceshipPos.z < 8.1f &&
+		currentCheckpointIndex == 1)
+	{
+		currentCheckpointIndex = 2;
+	}
+
+	// Checkpoint 2
+	if (spaceshipPos.x > -1.0f && spaceshipPos.x < 1.0f &&
+		spaceshipPos.y > -1.26f && spaceshipPos.y < 1.9f &&
+		spaceshipPos.z > 11.9f && spaceshipPos.z < 12.1f &&
+		currentCheckpointIndex == 2)
+	{
+		currentCheckpointIndex = 3;
+	}
+
+	// Checkpoint 3
+	if (spaceshipPos.x > -1.0f && spaceshipPos.x < 1.0f &&
+		spaceshipPos.y > -1.26f && spaceshipPos.y < 1.9f &&
+		spaceshipPos.z > 15.9f && spaceshipPos.z < 16.1f &&
+		currentCheckpointIndex == 3)
+	{
+		currentCheckpointIndex = 4;
+		colorIndex = 1;
+	}
+
+
+	// Finishing the race
+	if (spaceshipPos.x > -1.0f && spaceshipPos.x < 1.0f &&
+		spaceshipPos.y > -1.26f && spaceshipPos.y < 1.9f &&
+		spaceshipPos.z > 19.9f && spaceshipPos.z < 20.1f &&
+		currentCheckpointIndex == 4)
+	{
+		// Teleport
+		cameraPos = glm::vec3(-20.0f, -20.0f, -17.5f);
+		cameraDir = glm::vec3(0.f, 0.f, -1.0f);
+
+	}
+	else {
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+			spaceshipPos += spaceshipDir * moveSpeed;
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+			spaceshipPos -= spaceshipDir * moveSpeed;
+		if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+			spaceshipPos += spaceshipSide * moveSpeed;
+		if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+			spaceshipPos -= spaceshipSide * moveSpeed;
+		if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
+			spaceshipPos += spaceshipUp * moveSpeed;
+		if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
+			spaceshipPos -= spaceshipUp * moveSpeed;
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+			spaceshipDir = glm::vec3(glm::eulerAngleY(angleSpeed) * glm::vec4(spaceshipDir, 0));
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+			spaceshipDir = glm::vec3(glm::eulerAngleY(-angleSpeed) * glm::vec4(spaceshipDir, 0));
+		cameraPos = spaceshipPos - 1.5 * spaceshipDir + glm::vec3(0, 1, 0) * 0.5f;
+		cameraDir = spaceshipDir;
+	}
+	
+
 	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
 		exposition -= 0.05;
 	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
@@ -290,6 +386,7 @@ void renderLoop(GLFWwindow* window) {
 		processInput(window);
 
 		renderScene(window);
+		
 		glfwPollEvents();
 	}
 }
