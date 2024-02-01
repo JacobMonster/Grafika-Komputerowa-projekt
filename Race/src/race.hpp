@@ -211,6 +211,7 @@ glm::mat4 createPerspectiveMatrix()
 
 void drawObjectColor(Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec3 color) {
 
+
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
 	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
 	glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
@@ -400,6 +401,63 @@ void renderScene(GLFWwindow* window)
 		glm::vec3(0.5, 0.2, 0.0)
 	);
 
+	// Checkpoint 2
+	drawObjectColor(checkpointContext,
+		glm::translate(glm::vec3(5.0f, 3.0f, 12.0f)) * glm::scale(glm::vec3(3.0f)),
+		glm::vec3(1.0, 1.0, 0.0)
+	);
+
+	// Checkpoint 3
+	drawObjectColor(checkpointContext,
+		glm::translate(glm::vec3(7.0f, 6.0f, 18.0f)) * glm::scale(glm::vec3(3.0f)),
+		glm::vec3(1.0, 1.0, 0.0)
+	);
+
+	// Checkpoint 4
+	drawObjectColor(checkpointContext,
+		glm::translate(glm::vec3(5.0f, 1.0f, 24.0f)) * glm::scale(glm::vec3(3.0f)),
+		glm::vec3(1.0, 1.0, 0.0)
+	);
+
+	// Checkpoint 5
+	drawObjectColor(checkpointContext,
+		glm::translate(glm::vec3(3.0f, 4.0f, 30.0f)) * glm::scale(glm::vec3(3.0f)),
+		glm::vec3(1.0, 1.0, 0.0)
+	);
+
+
+	// Checkpoint 6
+	drawObjectColor(checkpointContext,
+		glm::translate(glm::vec3(5.0f, 5.0f, 36.0f)) * glm::scale(glm::vec3(3.0f)),
+		glm::vec3(1.0, 1.0, 0.0)
+	);
+
+
+	// Checkpoint 7
+	drawObjectColor(checkpointContext,
+		glm::translate(glm::vec3(5.0f, 7.0f, 42.0f)) * glm::scale(glm::vec3(3.0f)),
+		glm::vec3(1.0, 1.0, 0.0)
+	);
+
+	// Checkpoint 8
+	drawObjectColor(checkpointContext,
+		glm::translate(glm::vec3(7.0f, 4.0f, 48.0f)) * glm::scale(glm::vec3(3.0f)),
+		glm::vec3(1.0, 1.0, 0.0)
+	);
+
+	// Checkpoint 9
+	drawObjectColor(checkpointContext,
+		glm::translate(glm::vec3(5.0f, 2.0f, 54.0f)) * glm::scale(glm::vec3(3.0f)),
+		glm::vec3(1.0, 1.0, 0.0)
+	);
+
+	// Checkpoint 10
+	drawObjectColor(checkpointContext,
+		glm::translate(glm::vec3(5.0f, 1.0f, 60.0f)) * glm::scale(glm::vec3(3.0f)),
+		glm::vec3(1.0, 1.0, 0.0)
+	);
+
+
 	// Earth
 	//drawObjectTexture(sphereContext, glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(4.f, 0, 0)) * glm::eulerAngleY(time) * glm::scale(glm::vec3(0.3f)), texture::earth);
 
@@ -490,8 +548,8 @@ void processInput(GLFWwindow* window)
 {
 	glm::vec3 spaceshipSide = glm::normalize(glm::cross(spaceshipDir, glm::vec3(0.f, 1.f, 0.f)));
 	glm::vec3 spaceshipUp = glm::vec3(0.f, 1.f, 0.f);
-	float angleSpeed = 0.05f;
-	float moveSpeed = 0.05f;
+	float angleSpeed = 0.005f;
+	float moveSpeed = 0.01f;
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
