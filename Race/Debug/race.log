@@ -1,55 +1,48 @@
-<<<<<<< HEAD
-﻿  race.vcxproj -> C:\Users\tobip\source\repos\grafika\projekt\Debug\projekt.exe
-=======
 ﻿  main.cpp
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: "APIENTRY": ponowna definicja makra
   (kompilowanie pliku źródłowego „src/main.cpp”)
-  C:\Users\jakub\Desktop\grafika-projekt\Grafika-Komputerowa-projekt\dependencies\glfw-3.3.8.bin.WIN32\include\GLFW\glfw3.h(123,1):
+  C:\Users\tobip\source\repos\grafika\projekt\dependencies\glfw-3.3.8.bin.WIN32\include\GLFW\glfw3.h(123,1):
   zobacz poprzednią definicję „APIENTRY”
   
-C:\Users\jakub\Desktop\grafika-projekt\Grafika-Komputerowa-projekt\Race\src\race.hpp(163,20): warning C4305: "inicjowanie": obcięcie z "double" do "float"
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(172,20): warning C4305: "inicjowanie": obcięcie z "double" do "float"
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\jakub\Desktop\grafika-projekt\Grafika-Komputerowa-projekt\Race\src\race.hpp(186,10): warning C4305: "inicjowanie": obcięcie z "double" do "float"
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(335,13): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\jakub\Desktop\grafika-projekt\Grafika-Komputerowa-projekt\Race\src\race.hpp(245,13): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(366,124): warning C4305: "argument": obcięcie z "double" do "T"
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(366,124): warning C4305:         with
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(366,124): warning C4305:         [
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(366,124): warning C4305:             T=float
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(366,124): warning C4305:         ]
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\jakub\Desktop\grafika-projekt\Grafika-Komputerowa-projekt\Race\src\race.hpp(268,124): warning C4305: "argument": obcięcie z "double" do "T"
-C:\Users\jakub\Desktop\grafika-projekt\Grafika-Komputerowa-projekt\Race\src\race.hpp(268,124): warning C4305:         with
-C:\Users\jakub\Desktop\grafika-projekt\Grafika-Komputerowa-projekt\Race\src\race.hpp(268,124): warning C4305:         [
-C:\Users\jakub\Desktop\grafika-projekt\Grafika-Komputerowa-projekt\Race\src\race.hpp(268,124): warning C4305:             T=float
-C:\Users\jakub\Desktop\grafika-projekt\Grafika-Komputerowa-projekt\Race\src\race.hpp(268,124): warning C4305:         ]
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(372,135): warning C4305: "argument": obcięcie z "double" do "T"
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(372,135): warning C4305:         with
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(372,135): warning C4305:         [
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(372,135): warning C4305:             T=float
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(372,135): warning C4305:         ]
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\jakub\Desktop\grafika-projekt\Grafika-Komputerowa-projekt\Race\src\race.hpp(274,135): warning C4305: "argument": obcięcie z "double" do "T"
-C:\Users\jakub\Desktop\grafika-projekt\Grafika-Komputerowa-projekt\Race\src\race.hpp(274,135): warning C4305:         with
-C:\Users\jakub\Desktop\grafika-projekt\Grafika-Komputerowa-projekt\Race\src\race.hpp(274,135): warning C4305:         [
-C:\Users\jakub\Desktop\grafika-projekt\Grafika-Komputerowa-projekt\Race\src\race.hpp(274,135): warning C4305:             T=float
-C:\Users\jakub\Desktop\grafika-projekt\Grafika-Komputerowa-projekt\Race\src\race.hpp(274,135): warning C4305:         ]
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(378,50): warning C4305: "argument": obcięcie z "double" do "T"
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(378,50): warning C4305:         with
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(378,50): warning C4305:         [
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(378,50): warning C4305:             T=float
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(378,50): warning C4305:         ]
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\jakub\Desktop\grafika-projekt\Grafika-Komputerowa-projekt\Race\src\race.hpp(280,50): warning C4305: "argument": obcięcie z "double" do "T"
-C:\Users\jakub\Desktop\grafika-projekt\Grafika-Komputerowa-projekt\Race\src\race.hpp(280,50): warning C4305:         with
-C:\Users\jakub\Desktop\grafika-projekt\Grafika-Komputerowa-projekt\Race\src\race.hpp(280,50): warning C4305:         [
-C:\Users\jakub\Desktop\grafika-projekt\Grafika-Komputerowa-projekt\Race\src\race.hpp(280,50): warning C4305:             T=float
-C:\Users\jakub\Desktop\grafika-projekt\Grafika-Komputerowa-projekt\Race\src\race.hpp(280,50): warning C4305:         ]
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(578,21): warning C4305: "-=": obcięcie z "double" do "float"
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\jakub\Desktop\grafika-projekt\Grafika-Komputerowa-projekt\Race\src\race.hpp(511,21): warning C4305: "-=": obcięcie z "double" do "float"
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(580,21): warning C4305: "+=": obcięcie z "double" do "float"
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\jakub\Desktop\grafika-projekt\Grafika-Komputerowa-projekt\Race\src\race.hpp(513,21): warning C4305: "+=": obcięcie z "double" do "float"
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(598,16): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\jakub\Desktop\grafika-projekt\Grafika-Komputerowa-projekt\Race\src\race.hpp(531,16): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
-  (kompilowanie pliku źródłowego „src/main.cpp”)
-  
-C:\Users\jakub\Desktop\grafika-projekt\Grafika-Komputerowa-projekt\Race\src\race.hpp(532,16): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(599,16): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
 Box.obj : warning LNK4075: zignorowano opcję „/EDITANDCONTINUE” z powodu określenia opcji „/INCREMENTAL:NO”
 LINK : warning LNK4098: domyślna biblioteka „MSVCRT” powoduje konflikt z innymi bibliotekami; użyj opcji /NODEFAULTLIB:biblioteka
-  race.vcxproj -> C:\Users\jakub\Desktop\grafika-projekt\Grafika-Komputerowa-projekt\Debug\projekt.exe
->>>>>>> a823f8a783df8bd370e04912908cd35ebdcfd1aa
+  race.vcxproj -> C:\Users\tobip\source\repos\grafika\projekt\Debug\projekt.exe
