@@ -283,9 +283,6 @@ void renderScene(GLFWwindow* window)
 
 	// Checkpoint
 	drawObjectColor(checkpointContext,
-<<<<<<< HEAD
-		glm::translate(checkpointPos) * glm::scale(glm::vec3(3.0f)),
-=======
 		glm::translate(checkpointPos[currentCheckpointIndex]),
 		colors[colorIndex]
 	);
@@ -293,7 +290,6 @@ void renderScene(GLFWwindow* window)
 	// 1st place
 	drawObjectColor(place1Context,
 		glm::translate(glm::vec3(-20.f, -20.0f, -20.0f)),
->>>>>>> 717226483c23582e662b11cedee8e85a01d7d552
 		glm::vec3(1.0, 1.0, 0.0)
 	);
 	// 2nd place
