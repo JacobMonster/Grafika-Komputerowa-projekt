@@ -42,6 +42,8 @@ Core::RenderContext sphereContext;
 
 Core::RenderContext checkpointContext;
 Core::RenderContext place1Context;
+Core::RenderContext place2Context;
+Core::RenderContext place3Context;
 Core::RenderContext s2Context;
 Core::RenderContext s3Context;
 
@@ -49,10 +51,16 @@ Core::RenderContext s3Context;
 const int numCheckpoints = 5;
 std::vector<glm::vec3> checkpointPos = {
 	glm::vec3(0.0f, 1.0f, 4.0f),
-	glm::vec3(0.0f, 1.0f, 8.0f),
-	glm::vec3(0.0f, 1.0f, 12.0f),
-	glm::vec3(0.0f, 1.0f, 16.0f),
-	glm::vec3(0.0f, 1.0f, 20.0f)
+	//glm::vec3(0.0f, 1.0f, 8.0f),
+	//glm::vec3(0.0f, 1.0f, 12.0f),
+	//glm::vec3(0.0f, 1.0f, 16.0f),
+	//glm::vec3(0.0f, 1.0f, 20.0f)
+	glm::vec3(-12.5f, 1.0f, 10.5f),
+	glm::vec3(-6.5f, 1.0f, 25.5f),
+	glm::vec3(-3.5f, 1.0f, 43.5f),
+	glm::vec3(-6.5f, 1.0f, 54.0f),
+	// Assistans
+	glm::vec3(-6.5f, 1.0f, 60.0f)
 };
 
 int currentCheckpointIndex = 0;
@@ -66,11 +74,45 @@ std::vector<glm::vec3> colors = {
 
 int colorIndex = 0;
 
+glm::vec3 CalculateCatmullRomSpline(float t, const glm::vec3& p0, const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3)
+{
+	float t2 = t * t;
+	float t3 = t * t2;
+
+	glm::vec4 coefficients(-0.5f * t3 + t2 - 0.5f * t,
+		1.5f * t3 - 2.5f * t2 + 1.0f,
+		-1.5f * t3 + 2.0f * t2 + 0.5f * t,
+		0.5f * t3 - 0.5f * t2);
+
+	glm::mat4x3 controlPointsMatrix(p0, p1, p2, p3);
+
+	glm::vec3 result = controlPointsMatrix * coefficients;
+
+	return result;
+}
+
+glm::vec3 CalculateBotDirection(const glm::vec3& currentPosition, const glm::vec3& nextPosition) {
+	return glm::normalize(nextPosition - currentPosition);
+}
+
+glm::vec3 p01 = glm::vec3(2.0f, 1.0f, -1.0f);
+glm::vec3 p02 = glm::vec3(-2.0f, 1.0f, -1.0f);
+glm::vec3 p1 = checkpointPos[0];
+glm::vec3 p2 = checkpointPos[1];
+glm::vec3 p3 = checkpointPos[2];
+glm::vec3 p4 = checkpointPos[3];
+glm::vec3 p5 = checkpointPos[4];
+
+bool botRaceStarted = false;
+bool Bot1End = false;
+bool Bot2End = false;
+float raceStartTime = 0.0f;
+
 glm::vec3 cameraPos = glm::vec3(-4.f, 0, 0);
 glm::vec3 cameraDir = glm::vec3(1.f, 0.f, 0.f);
 
 
-glm::vec3 spaceshipPos = glm::vec3(0.0f, 1.000000f, -3.0f);
+glm::vec3 spaceshipPos = glm::vec3(0.0f, 1.000000f, -5.0f);
 glm::vec3 spaceshipDir = glm::vec3(0.0f, 0.000000f, 1.0f);
 
 glm::vec3 Bot1Pos = glm::vec3(2.0f, 1.0f, -2.0f);
@@ -79,6 +121,32 @@ glm::vec3 Bot1Dir = glm::normalize(glm::vec3(0.354510f, 0.000000f, 0.935054f));
 glm::vec3 Bot2Dir = glm::normalize(glm::vec3(-0.354510f, 0.000000f, 0.935054f));
 
 //glm::vec3 checkpointDir = glm::vec3(0.0f, 1.0f, 0.0f);
+
+bool checkpointReached(int index, glm::vec3 playerPos) {
+	if (playerPos.x >= checkpointPos[index].x - 1.0f && playerPos.x <= checkpointPos[index].x + 1.0f &&
+		playerPos.y >= checkpointPos[index].y - 2.25f && playerPos.y <= checkpointPos[index].y + 1.0f &&
+		playerPos.z >= checkpointPos[index].z - 0.1f && playerPos.z <= checkpointPos[index].z + 0.1f)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+glm::mat4 BotCameraRotationMatrix(glm::vec3 BotPos, glm::vec3 BotDir) {
+	glm::vec3 BotSide = glm::normalize(glm::cross(BotDir, glm::vec3(0.f, 1.f, 0.f)));
+	glm::vec3 BotUp = glm::normalize(glm::cross(BotSide, BotDir));
+	glm::mat4 BotCameraRotationMatrix = glm::mat4({
+		BotSide.x,BotSide.y,BotSide.z,0,
+		BotUp.x,BotUp.y,BotUp.z ,0,
+		-BotDir.x,-BotDir.y,-BotDir.z,0,
+		0.,0.,0.,1.,
+		});
+
+	return BotCameraRotationMatrix;
+}
 
 GLuint VAO, VBO;
 
@@ -193,6 +261,7 @@ void renderScene(GLFWwindow* window)
 	//	glm::translate(cameraPos + 1.5 * cameraDir + cameraUp * -0.5f) * inveseCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()),
 	//	glm::vec3(0.3, 0.3, 0.5)
 	//	);
+	// 
 	// Player
 	drawObjectColor(shipContext,
 		glm::translate(spaceshipPos) * spaceshipCameraRotationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1)),
@@ -201,7 +270,7 @@ void renderScene(GLFWwindow* window)
 
 	// Bot1
 	drawObjectColor(shipContext,
-		glm::translate(Bot1Pos) * glm::scale(glm::vec3(0.1)),
+		glm::translate(Bot1Pos) /** BotCameraRotationMatrix(Bot1Pos, Bot1Dir) * glm::eulerAngleY(glm::pi<float>())*/ * glm::scale(glm::vec3(0.1)),
 		glm::vec3(0.3, 0.3, 0.5)
 	);
 
@@ -211,7 +280,7 @@ void renderScene(GLFWwindow* window)
 		glm::vec3(0.3, 0.3, 0.5)
 	);
 
-	// Checkpoint 0
+	// Checkpoint
 	drawObjectColor(checkpointContext,
 		glm::translate(checkpointPos[currentCheckpointIndex]),
 		colors[colorIndex]
@@ -221,6 +290,16 @@ void renderScene(GLFWwindow* window)
 	drawObjectColor(place1Context,
 		glm::translate(glm::vec3(-20.f, -20.0f, -20.0f)),
 		glm::vec3(1.0, 1.0, 0.0)
+	);
+	// 2nd place
+	drawObjectColor(place2Context,
+		glm::translate(glm::vec3(-20.f, -15.0f, -20.0f)),
+		glm::vec3(0.5, 0.5, 0.5)
+	);
+	// 3rd place
+	drawObjectColor(place3Context,
+		glm::translate(glm::vec3(-20.f, -10.0f, -20.0f)),
+		glm::vec3(0.5, 0.2, 0.0)
 	);
 
 	// Earth
@@ -267,6 +346,8 @@ void init(GLFWwindow* window)
 	loadModelToContext("./models/spaceship.obj", shipContext);
 	loadModelToContext("./models/checkpoint.obj", checkpointContext);
 	loadModelToContext("./models/place1.obj", place1Context);
+	loadModelToContext("./models/place2.obj", place2Context);
+	loadModelToContext("./models/place3.obj", place3Context);
 	loadModelToContext("./models/s2.obj", s2Context);
 	loadModelToContext("./models/s3.obj", s3Context);
 
@@ -300,36 +381,28 @@ void processInput(GLFWwindow* window)
 	}
 
 	// Checkpoint 0
-	if (spaceshipPos.x > -1.0f && spaceshipPos.x < 1.0f &&
-		spaceshipPos.y > -1.26f && spaceshipPos.y < 1.9f &&
-		spaceshipPos.z > 3.9f && spaceshipPos.z < 4.1f &&
+	if (checkpointReached(0, spaceshipPos) &&
 		currentCheckpointIndex == 0)
 	{
 		currentCheckpointIndex = 1;
 	}
 
 	// Checkpoint 1
-	if (spaceshipPos.x > -1.0f && spaceshipPos.x < 1.0f &&
-		spaceshipPos.y > -1.26f && spaceshipPos.y < 1.9f &&
-		spaceshipPos.z > 7.9f && spaceshipPos.z < 8.1f &&
+	if (checkpointReached(1, spaceshipPos) &&
 		currentCheckpointIndex == 1)
 	{
 		currentCheckpointIndex = 2;
 	}
 
 	// Checkpoint 2
-	if (spaceshipPos.x > -1.0f && spaceshipPos.x < 1.0f &&
-		spaceshipPos.y > -1.26f && spaceshipPos.y < 1.9f &&
-		spaceshipPos.z > 11.9f && spaceshipPos.z < 12.1f &&
+	if (checkpointReached(2, spaceshipPos) &&
 		currentCheckpointIndex == 2)
 	{
 		currentCheckpointIndex = 3;
 	}
 
 	// Checkpoint 3
-	if (spaceshipPos.x > -1.0f && spaceshipPos.x < 1.0f &&
-		spaceshipPos.y > -1.26f && spaceshipPos.y < 1.9f &&
-		spaceshipPos.z > 15.9f && spaceshipPos.z < 16.1f &&
+	if (checkpointReached(3, spaceshipPos) &&
 		currentCheckpointIndex == 3)
 	{
 		currentCheckpointIndex = 4;
@@ -338,13 +411,19 @@ void processInput(GLFWwindow* window)
 
 
 	// Finishing the race
-	if (spaceshipPos.x > -1.0f && spaceshipPos.x < 1.0f &&
-		spaceshipPos.y > -1.26f && spaceshipPos.y < 1.9f &&
-		spaceshipPos.z > 19.9f && spaceshipPos.z < 20.1f &&
+	if (checkpointReached(4, spaceshipPos) &&
 		currentCheckpointIndex == 4)
 	{
 		// Teleport
-		cameraPos = glm::vec3(-20.0f, -20.0f, -17.5f);
+		if (Bot1End == false && Bot2End == false) {
+			cameraPos = glm::vec3(-20.0f, -20.0f, -17.5f);
+		}
+		else if (Bot1End == true && Bot2End == true) {
+			cameraPos = glm::vec3(-20.0f, -10.0f, -17.5f);
+		}
+		else {
+			cameraPos = glm::vec3(-20.0f, -15.0f, -17.5f);
+		}
 		cameraDir = glm::vec3(0.f, 0.f, -1.0f);
 
 	}
@@ -381,9 +460,78 @@ void processInput(GLFWwindow* window)
 
 // main loop
 void renderLoop(GLFWwindow* window) {
+
+	//botRaceStarted = true;
+
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
+
+		//if (botRaceStarted)
+		//{
+			// Kod do obs³ugi ruchu botów
+			float tBot1 = (glfwGetTime() * 0.5f - 3.0f);
+			float tBot2 = (glfwGetTime() * 0.3f - 1.0f);
+			
+			//spaceshipPos = Bot1Pos;
+			//std::cout << "tBot1: " << tBot1 << ", " << "Time: " << raceStartTime << ")\n";
+			
+			if (tBot1 < 1.0f) {
+				Bot1Pos = CalculateCatmullRomSpline(tBot1, p01, p01, p01, p01);
+			}
+			else if (tBot1 < 2.0f) {
+				Bot1Pos = CalculateCatmullRomSpline(tBot1 - 1.0f, p01, p01, p01, p1);
+			}
+			else if (tBot1 < 3.0f) {
+				Bot1Pos = CalculateCatmullRomSpline(tBot1 - 2.0f, p01, p01, p1, p2);
+			}
+			else if (tBot1 < 4.0f) {
+				Bot1Pos = CalculateCatmullRomSpline(tBot1 - 3.0f, p01, p1, p2, p3);
+			}
+			else if (tBot1 < 5.0f) {
+				Bot1Pos = CalculateCatmullRomSpline(tBot1 - 4.0f, p1, p2, p3, p4);
+			}
+			else if (tBot1 < 6.0f) {
+				Bot1Pos = CalculateCatmullRomSpline(tBot1 - 5.0f, p2, p3, p4, p5);
+			}
+			else if (tBot1 < 7.0f) {
+				Bot1Pos = CalculateCatmullRomSpline(tBot1 - 6.0f, p3, p4, p5, checkpointPos[5]);
+				if (checkpointReached(4, Bot1Pos) && !checkpointReached(4, spaceshipPos)) {
+					Bot1End = true;
+					Bot1Pos = glm::vec3(2.0f, 1.0f, -2.0f);
+
+				}
+			}
+
+			
+			if (tBot2 < 1.0f) {
+				Bot2Pos = CalculateCatmullRomSpline(tBot2, p02, p02, p02, p02);
+			}
+			else if (tBot2 < 2.0f) {
+				Bot2Pos = CalculateCatmullRomSpline(tBot2 - 1.0f, p02, p02, p02, p1);
+			}
+			else if (tBot2 < 3.0f) {
+				Bot2Pos = CalculateCatmullRomSpline(tBot2 - 2.0f, p02, p02, p1, p2);
+			}
+			else if (tBot2 < 4.0f) {
+				Bot2Pos = CalculateCatmullRomSpline(tBot2 - 3.0f, p02, p1, p2, p3);
+			}
+			else if (tBot2 < 5.0f) {
+				Bot2Pos = CalculateCatmullRomSpline(tBot2 - 4.0f, p1, p2, p3, p4);
+			}
+			else if (tBot2 < 6.0f) {
+				Bot2Pos = CalculateCatmullRomSpline(tBot2 - 5.0f, p2, p3, p4, p5);
+			}
+			else if (tBot2 < 7.0f) {
+				Bot2Pos = CalculateCatmullRomSpline(tBot2 - 6.0f, p3, p4, p5, checkpointPos[5]);
+				if (checkpointReached(4, Bot2Pos) && !checkpointReached(4, spaceshipPos)) {
+					Bot2End = true;
+					Bot2Pos = glm::vec3(-2.0f, 1.0f, -2.0f);
+
+				}
+			}
+		//}
+
 
 		renderScene(window);
 		
