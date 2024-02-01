@@ -4,6 +4,7 @@
 #include "ext.hpp"
 #include <iostream>
 #include <cmath>
+#include "./SOIL/SOIL.h"
 
 #include "Shader_Loader.h"
 #include "Render_Utils.h"
@@ -30,16 +31,24 @@ namespace texture {
 	GLuint earthNormal;
 	GLuint asteroidNormal;
 	GLuint shipNormal;
+
+	GLuint sun;
+	GLuint mars;
 }
 
 GLuint program;
 GLuint programSun;
 GLuint programTex;
+GLuint programSkyBox;
+GLuint programEarth;
+GLuint programProcTex;
+GLuint cubemapTexture;
+
 Core::Shader_Loader shaderLoader;
 
 Core::RenderContext shipContext;
 Core::RenderContext sphereContext;
-
+Core::RenderContext cubeContext;
 Core::RenderContext checkpointContext;
 Core::RenderContext place1Context;
 Core::RenderContext place2Context;
@@ -183,8 +192,8 @@ glm::mat4 createPerspectiveMatrix()
 {
 
 	glm::mat4 perspectiveMatrix;
-	float n = 0.05;
-	float f = 20.;
+	float n = 0.05f;
+	float f = 100.0f;
 	float a1 = glm::min(aspectRatio, 1.f);
 	float a2 = glm::min(1 / aspectRatio, 1.f);
 	perspectiveMatrix = glm::mat4({
@@ -236,10 +245,91 @@ void drawObjectTexture(Core::RenderContext& context, glm::mat4 modelMatrix, GLui
 
 }
 
+void drawEarth(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureID, GLuint textureID2) {
+
+	glUseProgram(programEarth);
+	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
+	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
+	glUniformMatrix4fv(glGetUniformLocation(programEarth, "transformation"), 1, GL_FALSE, (float*)&transformation);
+	glUniformMatrix4fv(glGetUniformLocation(programEarth, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
+
+	Core::SetActiveTexture(textureID, "colorTexture", programEarth, 0);
+	Core::SetActiveTexture(textureID2, "clouds", programEarth, 2);
+
+	glUniform3f(glGetUniformLocation(programEarth, "lightPos"), 0, 0, 0);
+	Core::DrawContext(context);
+
+}
+
+void drawObjectProc(Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec3 color1, glm::vec3 color2) {
+
+	glUseProgram(programProcTex);
+	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
+	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
+	glUniformMatrix4fv(glGetUniformLocation(programProcTex, "transformation"), 1, GL_FALSE, (float*)&transformation);
+	glUniformMatrix4fv(glGetUniformLocation(programProcTex, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
+	glUniform3f(glGetUniformLocation(programProcTex, "color1"), color1.x, color1.y, color1.z);
+	glUniform3f(glGetUniformLocation(programProcTex, "color2"), color2.x, color2.y, color2.z);
+	glUniform3f(glGetUniformLocation(programProcTex, "lightPos"), 0, 0, 0);
+	Core::DrawContext(context);
+
+}
+
+void drawSkyBox(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint cubemapTexture) {
+
+	glUseProgram(programSkyBox);
+	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
+	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
+	glUniformMatrix4fv(glGetUniformLocation(programSkyBox, "transformation"), 1, GL_FALSE, (float*)&transformation);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+	glUniform1i(glGetUniformLocation(programSkyBox, "skybox"), 0);
+	Core::DrawContext(context);
+
+}
+
+GLuint loadCubeMap(const std::vector<std::string>& filePaths)
+{
+	GLuint textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+	int w, h;
+	for (unsigned int i = 0; i < 6; i++)
+	{
+		unsigned char* image = SOIL_load_image(filePaths[i].c_str(), &w, &h, 0, SOIL_LOAD_RGBA);
+		if (image)
+		{
+			glTexImage2D(
+				GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+				0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, image
+			);
+			SOIL_free_image_data(image);
+		}
+		else
+		{
+			std::cout << "Cubemap tex failed to load at path: " << filePaths[i] << std::endl;
+			SOIL_free_image_data(image);
+		}
+	}
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	return textureID;
+}
+
 void renderScene(GLFWwindow* window)
 {
 	glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glDisable(GL_DEPTH_TEST);
+	drawSkyBox(cubeContext, glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)), cubemapTexture);
+	glEnable(GL_DEPTH_TEST);
+
 	glm::mat4 transformation;
 	float time = glfwGetTime();
 
@@ -256,6 +346,14 @@ void renderScene(GLFWwindow* window)
 		0.,0.,0.,1.,
 		});
 
+	// Mars
+	//drawObjectTexture(sphereContext, glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(4.f, 0, 0)) * glm::scale(glm::vec3(0.3f)), texture::mars);
+
+	//drawObjectProc(sphereContext,
+		//glm::eulerAngleY(time / 2) * glm::translate(glm::vec3(2.f, 2.f, 0)) * glm::scale(glm::vec3(0.3f)),
+		//glm::vec3(1.0, 0.0, 0.0), glm::vec3(1.0, 1.0, 0.0));
+
+	//drawObjectTexture(sphereContext, glm::eulerAngleY(time / 2) * glm::translate(glm::vec3(3.f, 0, 0)) * glm::scale(glm::vec3(0.3f)), texture::earth);
 
 	//drawObjectColor(shipContext,
 	//	glm::translate(cameraPos + 1.5 * cameraDir + cameraUp * -0.5f) * inveseCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()),
@@ -303,11 +401,16 @@ void renderScene(GLFWwindow* window)
 	);
 
 	// Earth
-	drawObjectTexture(sphereContext, glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(4.f, 0, 0)) * glm::eulerAngleY(time) * glm::scale(glm::vec3(0.3f)), texture::earth);
+	//drawObjectTexture(sphereContext, glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(4.f, 0, 0)) * glm::eulerAngleY(time) * glm::scale(glm::vec3(0.3f)), texture::earth);
+
+	
 
 	// Moon
 	drawObjectTexture(sphereContext,
 		glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(4.f, 0, 0)) * glm::eulerAngleY(time) * glm::translate(glm::vec3(1.f, 0, 0)) * glm::scale(glm::vec3(0.1f)), texture::moon);
+
+	// Earth
+	drawEarth(sphereContext, glm::eulerAngleY(time / 1) * glm::translate(glm::vec3(2.f, 0, 0)) * glm::scale(glm::vec3(0.3f)), texture::earth, texture::clouds);
 
 	spotlightPos = spaceshipPos + 0.5 * spaceshipDir;
 	spotlightConeDir = spaceshipDir;
@@ -341,9 +444,13 @@ void init(GLFWwindow* window)
 	program = shaderLoader.CreateProgram("shaders/shader_8_1.vert", "shaders/shader_8_1.frag");
 	programSun = shaderLoader.CreateProgram("shaders/shader_8_sun.vert", "shaders/shader_8_sun.frag");
 	programTex = shaderLoader.CreateProgram("shaders/shader_5_1_tex.vert", "shaders/shader_5_1_tex.frag");
+	programEarth = shaderLoader.CreateProgram("shaders/shader_earth.vert", "shaders/shader_earth.frag");
+	programProcTex = shaderLoader.CreateProgram("shaders/shader_proc_tex.vert", "shaders/shader_proc_tex.frag");
+	programSkyBox = shaderLoader.CreateProgram("shaders/shader_skybox.vert", "shaders/shader_skybox.frag");
 
 	loadModelToContext("./models/sphere.obj", sphereContext);
 	loadModelToContext("./models/spaceship.obj", shipContext);
+	loadModelToContext("./models/cube.obj", cubeContext);
 	loadModelToContext("./models/checkpoint.obj", checkpointContext);
 	loadModelToContext("./models/place1.obj", place1Context);
 	loadModelToContext("./models/place2.obj", place2Context);
@@ -353,6 +460,21 @@ void init(GLFWwindow* window)
 
 	texture::earth = Core::LoadTexture("textures/earth.png");
 	texture::moon = Core::LoadTexture("textures/moon.jpg");
+	texture::clouds = Core::LoadTexture("./textures/clouds.jpg");
+	texture::grid = Core::LoadTexture("./textures/grid.png");
+	texture::sun = Core::LoadTexture("./textures/sun.jg");
+	texture::mars = Core::LoadTexture("./textures/mars.jpg");
+
+	std::vector<std::string> skyboxTextures = {
+	"./textures/skybox/space_rt.png",
+	"./textures/skybox/space_lf.png",
+	"./textures/skybox/space_up.png",
+	"./textures/skybox/space_dn.png",
+	"./textures/skybox/space_ft.png",
+	"./textures/skybox/space_bk.png"
+	};
+
+	cubemapTexture = loadCubeMap(skyboxTextures);
 
 }
 
@@ -360,6 +482,7 @@ void shutdown(GLFWwindow* window)
 {
 	shaderLoader.DeleteProgram(program);
 	shaderLoader.DeleteProgram(programTex);
+	shaderLoader.DeleteProgram(programSkyBox);
 }
 
 //obsluga wejscia

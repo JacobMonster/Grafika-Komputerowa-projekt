@@ -112,5 +112,29 @@
     <None Include="shaders\shader_5_1_tex.frag">
       <Filter>Shader Files</Filter>
     </None>
+    <None Include="shaders\shader_skybox.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\shader_skybox.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\shader_earth.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\shader_earth.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\shader_proc_tex.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\shader_proc_tex.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\shader_5_tex.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\shader_5_tex.vert">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
