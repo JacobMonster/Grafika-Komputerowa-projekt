@@ -23,6 +23,12 @@ namespace texture {
 	GLuint earth;
 	GLuint clouds;
 	GLuint moon;
+	GLuint mars;  // New texture for Mars
+	GLuint venus; // New texture for Venus
+	GLuint jupiter; // New texture for Jupiter
+	GLuint saturn;  // New texture for Saturn
+	GLuint uranus;  // New texture for Uranus
+	GLuint neptune; // New texture for Neptune
 	GLuint ship;
 
 	GLuint grid;
@@ -182,7 +188,7 @@ glm::mat4 createCameraMatrix()
 glm::mat4 createPerspectiveMatrix()
 {
 
-	glm::mat4 perspectiveMatrix;
+	glm::mat4 perspectiveMatrix = glm::perspective(glm::radians(60.0f), aspectRatio, 0.1f, 100.0f);
 	float n = 0.05;
 	float f = 20.;
 	float a1 = glm::min(aspectRatio, 1.f);
@@ -303,61 +309,7 @@ void renderScene(GLFWwindow* window)
 		glm::vec3(0.5, 0.2, 0.0)
 	);
 
-	// Checkpoint 2
-	drawObjectColor(checkpointContext,
-		glm::translate(glm::vec3(5.0f, 3.0f, 12.0f)) * glm::scale(glm::vec3(3.0f)),
-		glm::vec3(1.0, 1.0, 0.0)
-	);
 
-	// Checkpoint 3
-	drawObjectColor(checkpointContext,
-		glm::translate(glm::vec3(7.0f, 6.0f, 18.0f)) * glm::scale(glm::vec3(3.0f)),
-		glm::vec3(1.0, 1.0, 0.0)
-	);
-
-	// Checkpoint 4
-	drawObjectColor(checkpointContext,
-		glm::translate(glm::vec3(5.0f, 1.0f, 24.0f)) * glm::scale(glm::vec3(3.0f)),
-		glm::vec3(1.0, 1.0, 0.0)
-	);
-
-	// Checkpoint 5
-	drawObjectColor(checkpointContext,
-		glm::translate(glm::vec3(3.0f, 4.0f, 30.0f)) * glm::scale(glm::vec3(3.0f)),
-		glm::vec3(1.0, 1.0, 0.0)
-	);
-
-
-	// Checkpoint 6
-	drawObjectColor(checkpointContext,
-		glm::translate(glm::vec3(5.0f, 5.0f, 36.0f)) * glm::scale(glm::vec3(3.0f)),
-		glm::vec3(1.0, 1.0, 0.0)
-	);
-
-
-	// Checkpoint 7
-	drawObjectColor(checkpointContext,
-		glm::translate(glm::vec3(5.0f, 7.0f, 42.0f)) * glm::scale(glm::vec3(3.0f)),
-		glm::vec3(1.0, 1.0, 0.0)
-	);
-
-	// Checkpoint 8
-	drawObjectColor(checkpointContext,
-		glm::translate(glm::vec3(7.0f, 4.0f, 48.0f)) * glm::scale(glm::vec3(3.0f)),
-		glm::vec3(1.0, 1.0, 0.0)
-	);
-
-	// Checkpoint 9
-	drawObjectColor(checkpointContext,
-		glm::translate(glm::vec3(5.0f, 2.0f, 54.0f)) * glm::scale(glm::vec3(3.0f)),
-		glm::vec3(1.0, 1.0, 0.0)
-	);
-
-	// Checkpoint 10
-	drawObjectColor(checkpointContext,
-		glm::translate(glm::vec3(5.0f, 1.0f, 60.0f)) * glm::scale(glm::vec3(3.0f)),
-		glm::vec3(1.0, 1.0, 0.0)
-	);
 
 
 	// Earth
@@ -366,6 +318,30 @@ void renderScene(GLFWwindow* window)
 	// Moon
 	drawObjectTexture(sphereContext,
 		glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(4.f, 0, 0)) * glm::eulerAngleY(time) * glm::translate(glm::vec3(1.f, 0, 0)) * glm::scale(glm::vec3(0.1f)), texture::moon);
+
+	// Mars
+	drawObjectTexture(sphereContext,
+		glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(-6.f, 0, 0)) * glm::eulerAngleY(-time) * glm::scale(glm::vec3(0.25f)), texture::mars);
+
+	// Venus
+	drawObjectTexture(sphereContext,
+		glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(-10.f, 0, 0)) * glm::eulerAngleY(time) * glm::scale(glm::vec3(0.2f)), texture::venus);
+
+	// Jupiter
+	drawObjectTexture(sphereContext,
+		glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(8.f, 0, 0)) * glm::eulerAngleY(-time) * glm::scale(glm::vec3(0.5f)), texture::jupiter);
+
+	// Saturn
+	drawObjectTexture(sphereContext,
+		glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(-14.f, 0, 0)) * glm::eulerAngleY(-time) * glm::scale(glm::vec3(0.4f)), texture::saturn);
+
+	// Uranus
+	drawObjectTexture(sphereContext,
+		glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(-18.f, 0, 0)) * glm::eulerAngleY(time) * glm::scale(glm::vec3(0.35f)), texture::uranus);
+
+	// Neptune
+	drawObjectTexture(sphereContext,
+		glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(12.f, 0, 0)) * glm::eulerAngleY(-time) * glm::scale(glm::vec3(0.3f)), texture::neptune);
 
 	spotlightPos = spaceshipPos + 0.5 * spaceshipDir;
 	spotlightConeDir = spaceshipDir;
@@ -409,8 +385,14 @@ void init(GLFWwindow* window)
 	loadModelToContext("./models/s2.obj", s2Context);
 	loadModelToContext("./models/s3.obj", s3Context);
 
-	texture::earth = Core::LoadTexture("textures/earth.png");
-	texture::moon = Core::LoadTexture("textures/moon.jpg");
+	texture::earth = Core::LoadTexture("textures/earth.png"); 
+	texture::moon = Core::LoadTexture("textures/moon.jpg"); 
+	texture::mars = Core::LoadTexture("textures/mars.jpg"); 
+	texture::saturn = Core::LoadTexture("textures/saturn.jpg"); 
+	texture::jupiter = Core::LoadTexture("textures/jupiter.jpg"); 
+	texture::neptune = Core::LoadTexture("textures/neptune.jpg"); 
+	texture::uranus = Core::LoadTexture("textures/uranus.jpg"); 
+	texture::venus = Core::LoadTexture("textures/venus.jpg"); 
 
 }
 
