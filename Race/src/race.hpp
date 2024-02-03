@@ -328,7 +328,7 @@ void renderScene(GLFWwindow* window)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glDisable(GL_DEPTH_TEST);
-	drawSkyBox(cubeContext, glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)), cubemapTexture);
+	drawSkyBox(cubeContext, glm::translate(glm::mat4(1.0f), cameraPos), cubemapTexture);
 	glEnable(GL_DEPTH_TEST);
 
 	glm::mat4 transformation;
