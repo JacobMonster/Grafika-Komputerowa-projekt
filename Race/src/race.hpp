@@ -22,6 +22,7 @@
 
 namespace texture {
 	GLuint earth;
+	GLuint earth2;
 	GLuint clouds;
 	GLuint moon;
 	GLuint ship;
@@ -30,10 +31,16 @@ namespace texture {
 
 	GLuint earthNormal;
 	GLuint asteroidNormal;
+	GLuint spaceship;
 	GLuint shipNormal;
 
 	GLuint sun;
 	GLuint mars;
+
+	GLuint earth_normal;
+	GLuint earth2_normal;
+	GLuint spaceship_normal;
+	GLuint moon_normal;
 }
 
 GLuint program;
@@ -43,6 +50,8 @@ GLuint programSkyBox;
 GLuint programEarth;
 GLuint programProcTex;
 GLuint cubemapTexture;
+GLuint programTexNormal;
+GLuint programShip;
 
 Core::Shader_Loader shaderLoader;
 
@@ -163,7 +172,7 @@ float aspectRatio = 1.f;
 
 float exposition = 1.f;
 
-glm::vec3 lightPos = glm::vec3(-8, 4, 2);
+glm::vec3 lightPos = glm::vec3(0, 5, -2);
 glm::vec3 lightColor = glm::vec3(0.9, 0.7, 0.8) * 100;
 
 glm::vec3 spotlightPos = glm::vec3(0, 0, 0);
@@ -211,7 +220,7 @@ glm::mat4 createPerspectiveMatrix()
 
 void drawObjectColor(Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec3 color) {
 
-
+	glUseProgram(program);
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
 	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
 	glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
@@ -240,10 +249,66 @@ void drawObjectTexture(Core::RenderContext& context, glm::mat4 modelMatrix, GLui
 	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
 	glUniformMatrix4fv(glGetUniformLocation(programTex, "transformation"), 1, GL_FALSE, (float*)&transformation);
 	glUniformMatrix4fv(glGetUniformLocation(programTex, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
-	glUniform3f(glGetUniformLocation(programTex, "lightPos"), 0, 0, 0);
+	glUniform3f(glGetUniformLocation(programTex, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 	Core::SetActiveTexture(textureID, "colorTexture", programTex, 0);
 	Core::DrawContext(context);
 
+}
+
+void drawObjectTextureNormal(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureID, GLuint normalmapId) {
+	glUseProgram(programTexNormal);
+
+	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
+	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
+
+	glUniformMatrix4fv(glGetUniformLocation(programTexNormal, "transformation"), 1, GL_FALSE, (float*)&transformation);
+	glUniformMatrix4fv(glGetUniformLocation(programTexNormal, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
+	glUniform3f(glGetUniformLocation(programTexNormal, "cameraPos"), cameraPos.x, cameraPos.y, cameraPos.z);
+	glUniform3f(glGetUniformLocation(programTexNormal, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+
+	// Aktywuj jednostkê teksturowania nr 0 dla kolorowej tekstury
+	Core::SetActiveTexture(textureID, "colorTexture", programTexNormal, 0);
+
+	// Aktywuj jednostkê teksturowania nr 1 dla mapy normalnej
+	Core::SetActiveTexture(normalmapId, "normalSampler", programTexNormal, 1);
+
+
+	/*glUniform1f(glGetUniformLocation(program, "exposition"), exposition);
+	glUniform3f(glGetUniformLocation(program, "lightColor"), lightColor.x, lightColor.y, lightColor.z);
+	glUniform3f(glGetUniformLocation(program, "spotlightConeDir"), spotlightConeDir.x, spotlightConeDir.y, spotlightConeDir.z);
+	glUniform3f(glGetUniformLocation(program, "spotlightPos"), spotlightPos.x, spotlightPos.y, spotlightPos.z);
+	glUniform3f(glGetUniformLocation(program, "spotlightColor"), spotlightColor.x, spotlightColor.y, spotlightColor.z);
+	glUniform1f(glGetUniformLocation(program, "spotlightPhi"), spotlightPhi);*/
+
+	Core::DrawContext(context);
+}
+
+void drawObjectShip(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureID, GLuint normalmapId) {
+	glUseProgram(programShip);
+
+	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
+	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
+
+	glUniformMatrix4fv(glGetUniformLocation(programShip, "transformation"), 1, GL_FALSE, (float*)&transformation);
+	glUniformMatrix4fv(glGetUniformLocation(programShip, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
+	glUniform3f(glGetUniformLocation(programShip, "cameraPos"), cameraPos.x, cameraPos.y, cameraPos.z);
+	glUniform3f(glGetUniformLocation(programShip, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+
+	// Aktywuj jednostkê teksturowania nr 0 dla kolorowej tekstury
+	Core::SetActiveTexture(textureID, "colorTexture", programShip, 0);
+
+	// Aktywuj jednostkê teksturowania nr 1 dla mapy normalnej
+	Core::SetActiveTexture(normalmapId, "normalSampler", programShip, 1);
+
+
+	/*glUniform1f(glGetUniformLocation(programShip, "exposition"), exposition);
+	glUniform3f(glGetUniformLocation(programShip, "lightColor"), lightColor.x, lightColor.y, lightColor.z);
+	glUniform3f(glGetUniformLocation(programShip, "spotlightConeDir"), spotlightConeDir.x, spotlightConeDir.y, spotlightConeDir.z);
+	glUniform3f(glGetUniformLocation(programShip, "spotlightPos"), spotlightPos.x, spotlightPos.y, spotlightPos.z);
+	glUniform3f(glGetUniformLocation(programShip, "spotlightColor"), spotlightColor.x, spotlightColor.y, spotlightColor.z);
+	glUniform1f(glGetUniformLocation(programShip, "spotlightPhi"), spotlightPhi);*/
+
+	Core::DrawContext(context);
 }
 
 void drawEarth(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureID, GLuint textureID2) {
@@ -257,7 +322,7 @@ void drawEarth(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textu
 	Core::SetActiveTexture(textureID, "colorTexture", programEarth, 0);
 	Core::SetActiveTexture(textureID2, "clouds", programEarth, 2);
 
-	glUniform3f(glGetUniformLocation(programEarth, "lightPos"), 0, 0, 0);
+	glUniform3f(glGetUniformLocation(programEarth, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 	Core::DrawContext(context);
 
 }
@@ -271,7 +336,7 @@ void drawObjectProc(Core::RenderContext& context, glm::mat4 modelMatrix, glm::ve
 	glUniformMatrix4fv(glGetUniformLocation(programProcTex, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
 	glUniform3f(glGetUniformLocation(programProcTex, "color1"), color1.x, color1.y, color1.z);
 	glUniform3f(glGetUniformLocation(programProcTex, "color2"), color2.x, color2.y, color2.z);
-	glUniform3f(glGetUniformLocation(programProcTex, "lightPos"), 0, 0, 0);
+	glUniform3f(glGetUniformLocation(programProcTex, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 	Core::DrawContext(context);
 
 }
@@ -362,21 +427,25 @@ void renderScene(GLFWwindow* window)
 	//	);
 	// 
 	// Player
+	drawObjectShip(shipContext,
+		glm::translate(spaceshipPos) * spaceshipCameraRotationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1)),
+		texture::spaceship, texture::spaceship_normal
+	);/*
 	drawObjectColor(shipContext,
 		glm::translate(spaceshipPos) * spaceshipCameraRotationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1)),
 		glm::vec3(0.3, 0.3, 0.5)
-	);
+	);*/
 
 	// Bot1
-	drawObjectColor(shipContext,
+	drawObjectShip(shipContext,
 		glm::translate(Bot1Pos) /** BotCameraRotationMatrix(Bot1Pos, Bot1Dir) * glm::eulerAngleY(glm::pi<float>())*/ * glm::scale(glm::vec3(0.1)),
-		glm::vec3(0.3, 0.3, 0.5)
+		texture::spaceship, texture::spaceship_normal
 	);
 
 	// Bot2
-	drawObjectColor(shipContext,
+	drawObjectShip(shipContext,
 		glm::translate(Bot2Pos) * glm::scale(glm::vec3(0.1)),
-		glm::vec3(0.3, 0.3, 0.5)
+		texture::spaceship, texture::spaceship_normal
 	);
 
 	// Checkpoint
@@ -408,11 +477,24 @@ void renderScene(GLFWwindow* window)
 	
 
 	// Moon
+	/*
 	drawObjectTexture(sphereContext,
-		glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(4.f, 0, 0)) * glm::eulerAngleY(time) * glm::translate(glm::vec3(1.f, 0, 0)) * glm::scale(glm::vec3(0.1f)), texture::moon);
+		glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(4.f, 0, 2.0f)) * glm::eulerAngleY(time) * glm::translate(glm::vec3(1.f, 0, 0)) * glm::scale(glm::vec3(0.1f)), texture::moon);
+	*/
 
-	// Earth
-	drawEarth(sphereContext, glm::eulerAngleY(time / 1) * glm::translate(glm::vec3(2.f, 0, 0)) * glm::scale(glm::vec3(0.3f)), texture::earth, texture::clouds);
+	// Moon_Normal
+	drawObjectTextureNormal(sphereContext,
+		/*glm::eulerAngleY(time / 3) * */ glm::translate(glm::vec3(3.f, 0, 2.0f)) * /*glm::eulerAngleY(time) * */ glm::translate(glm::vec3(1.f, 0, 0)) * glm::scale(glm::vec3(0.1f)), texture::moon, texture::moon_normal);
+
+	//Earth_Normal
+	drawObjectTextureNormal(sphereContext,
+		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(5.f, 0, 0)) * glm::scale(glm::vec3(0.3f)), texture::earth2, texture::earth2_normal);
+
+	// Earth 
+	/*
+	drawEarth(sphereContext, 
+		glm::eulerAngleY(time / 1) * glm::translate(glm::vec3(2.f, 0, 0)) * glm::scale(glm::vec3(0.3f)), texture::earth, texture::clouds);
+	*/
 
 	spotlightPos = spaceshipPos + 0.5 * spaceshipDir;
 	spotlightConeDir = spaceshipDir;
@@ -449,6 +531,9 @@ void init(GLFWwindow* window)
 	programEarth = shaderLoader.CreateProgram("shaders/shader_earth.vert", "shaders/shader_earth.frag");
 	programProcTex = shaderLoader.CreateProgram("shaders/shader_proc_tex.vert", "shaders/shader_proc_tex.frag");
 	programSkyBox = shaderLoader.CreateProgram("shaders/shader_skybox.vert", "shaders/shader_skybox.frag");
+	programTexNormal = shaderLoader.CreateProgram("shaders/shader_5_tex_normal.vert", "shaders/shader_5_tex_normal.frag");
+	programShip = shaderLoader.CreateProgram("shaders/shader_ship.vert", "shaders/shader_ship.frag");
+
 
 	loadModelToContext("./models/sphere.obj", sphereContext);
 	loadModelToContext("./models/spaceship.obj", shipContext);
@@ -461,11 +546,18 @@ void init(GLFWwindow* window)
 	loadModelToContext("./models/s3.obj", s3Context);
 
 	texture::earth = Core::LoadTexture("textures/earth.png");
+	texture::earth2 = Core::LoadTexture("textures/earth2.png");
 	texture::moon = Core::LoadTexture("textures/moon.jpg");
 	texture::clouds = Core::LoadTexture("./textures/clouds.jpg");
 	texture::grid = Core::LoadTexture("./textures/grid.png");
 	texture::sun = Core::LoadTexture("./textures/sun.jg");
 	texture::mars = Core::LoadTexture("./textures/mars.jpg");
+	texture::spaceship = Core::LoadTexture("./textures/spaceshipPBR/StarSparrow_albedo.png");
+
+	texture::earth_normal = Core::LoadTexture("./textures/earth_normalmap.png");
+	texture::earth2_normal = Core::LoadTexture("./textures/earth2_normals.png");
+	texture::spaceship_normal = Core::LoadTexture("./textures/spaceshipPBR/StarSparrow_Normal.png");
+	texture::moon_normal = Core::LoadTexture("./textures/moon_normals.png");
 
 	std::vector<std::string> skyboxTextures = {
 	"./textures/skybox/space_rt.png",
@@ -485,6 +577,12 @@ void shutdown(GLFWwindow* window)
 	shaderLoader.DeleteProgram(program);
 	shaderLoader.DeleteProgram(programTex);
 	shaderLoader.DeleteProgram(programSkyBox);
+	shaderLoader.DeleteProgram(programSun);
+	shaderLoader.DeleteProgram(programEarth);
+	shaderLoader.DeleteProgram(programProcTex);
+	shaderLoader.DeleteProgram(cubemapTexture);
+	shaderLoader.DeleteProgram(programTexNormal);
+	shaderLoader.DeleteProgram(programShip);
 }
 
 //obsluga wejscia

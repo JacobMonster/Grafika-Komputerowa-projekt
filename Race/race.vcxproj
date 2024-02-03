@@ -45,11 +45,15 @@
     <None Include="shaders\shader_5_sun.frag" />
     <None Include="shaders\shader_5_sun.vert" />
     <None Include="shaders\shader_5_tex.frag" />
+    <None Include="shaders\shader_5_tex_normal.frag" />
     <None Include="shaders\shader_5_tex.vert" />
+    <None Include="shaders\shader_5_tex_normal.vert" />
     <None Include="shaders\shader_earth.frag" />
     <None Include="shaders\shader_earth.vert" />
     <None Include="shaders\shader_proc_tex.frag" />
     <None Include="shaders\shader_proc_tex.vert" />
+    <None Include="shaders\shader_ship.frag" />
+    <None Include="shaders\shader_ship.vert" />
     <None Include="shaders\shader_skybox.frag" />
     <None Include="shaders\shader_skybox.vert" />
   </ItemGroup>

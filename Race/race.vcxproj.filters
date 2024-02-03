@@ -130,10 +130,22 @@
     <None Include="shaders\shader_proc_tex.vert">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="shaders\shader_5_tex.frag">
+    <None Include="shaders\shader_5_tex_normal.frag">
       <Filter>Shader Files</Filter>
     </None>
     <None Include="shaders\shader_5_tex.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\shader_5_tex.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\shader_5_tex_normal.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\shader_ship.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\shader_ship.vert">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>
