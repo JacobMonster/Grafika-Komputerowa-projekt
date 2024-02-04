@@ -89,17 +89,11 @@
     <ClInclude Include="src\race.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\MenuRenderer.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\spline.hpp">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\shader_5_sun.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="shaders\shader_5_sun.vert">
-      <Filter>Shader Files</Filter>
-    </None>
     <None Include="shaders\shader_5_1.frag">
       <Filter>Shader Files</Filter>
     </None>
@@ -146,6 +140,18 @@
       <Filter>Shader Files</Filter>
     </None>
     <None Include="shaders\shader_ship.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\shader_8_1.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\shader_8_1.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\shader_8_sun.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\shader_8_sun.vert">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>

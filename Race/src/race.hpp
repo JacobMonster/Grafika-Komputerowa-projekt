@@ -19,6 +19,8 @@
 #include <thread>
 #include <chrono>
 
+#include "spline.hpp"
+
 
 namespace texture {
 	GLuint earth;
@@ -26,21 +28,39 @@ namespace texture {
 	GLuint clouds;
 	GLuint moon;
 	GLuint ship;
-
 	GLuint grid;
-
-	GLuint earthNormal;
-	GLuint asteroidNormal;
 	GLuint spaceship;
-	GLuint shipNormal;
-
 	GLuint sun;
 	GLuint mars;
 
+	//normals
 	GLuint earth_normal;
 	GLuint earth2_normal;
 	GLuint spaceship_normal;
 	GLuint moon_normal;
+	GLuint earthNormal;
+	GLuint asteroidNormal;
+	GLuint shipNormal;
+
+	//new
+	GLuint brain;
+	GLuint brain_normal;
+	GLuint tiles;
+	GLuint tiles_normal;
+	GLuint brick;
+	GLuint brick_normal;
+	GLuint foam;
+	GLuint foam_normal;
+	GLuint gold;
+	GLuint gold_normal;
+	GLuint rock;
+	GLuint rock_normal;
+	GLuint rock2;
+	GLuint rock2_normal;
+	GLuint rope;
+	GLuint rope_normal;
+	GLuint sand;
+	GLuint sand_normal;
 }
 
 GLuint program;
@@ -62,22 +82,16 @@ Core::RenderContext checkpointContext;
 Core::RenderContext place1Context;
 Core::RenderContext place2Context;
 Core::RenderContext place3Context;
-Core::RenderContext s2Context;
-Core::RenderContext s3Context;
 
 // Checkpoint positions
 const int numCheckpoints = 5;
 std::vector<glm::vec3> checkpointPos = {
 	glm::vec3(0.0f, 1.0f, 4.0f),
-	//glm::vec3(0.0f, 1.0f, 8.0f),
-	//glm::vec3(0.0f, 1.0f, 12.0f),
-	//glm::vec3(0.0f, 1.0f, 16.0f),
-	//glm::vec3(0.0f, 1.0f, 20.0f)
 	glm::vec3(-12.5f, 1.0f, 10.5f),
 	glm::vec3(-6.5f, 1.0f, 25.5f),
 	glm::vec3(-3.5f, 1.0f, 43.5f),
 	glm::vec3(-6.5f, 1.0f, 54.0f),
-	// Assistans
+	// Additional
 	glm::vec3(-6.5f, 1.0f, 60.0f)
 };
 
@@ -91,38 +105,6 @@ std::vector<glm::vec3> colors = {
 };
 
 int colorIndex = 0;
-
-glm::vec3 CalculateCatmullRomSpline(float t, const glm::vec3& Pos0, const glm::vec3& Pos1, const glm::vec3& Pos2, const glm::vec3& Pos3)
-{
-	float t2 = t * t;
-	float t3 = t * t2;
-
-	glm::vec4 coefficients(-0.5f * t3 + t2 - 0.5f * t,
-		1.5f * t3 - 2.5f * t2 + 1.0f,
-		-1.5f * t3 + 2.0f * t2 + 0.5f * t,
-		0.5f * t3 - 0.5f * t2);
-
-	glm::mat4x3 controlPointsMatrix(Pos0, Pos1, Pos2, Pos3);
-
-	glm::vec3 result = controlPointsMatrix * coefficients;
-
-	return result;
-}
-
-glm::vec3 CalculateCatmullRomSplineDerivative(float t, const glm::vec3& Pos0, const glm::vec3& Pos1, const glm::vec3& Pos2, const glm::vec3& Pos3)
-{
-	float t2 = t * t;
-	glm::vec4 coefficients(-1.5f * t2 + 2.0f * t - 0.5f,
-		4.5f * t2 - 5.0f * t,
-		-4.5f * t2 + 4.0f * t + 0.5f,
-		1.5f * t2 - 1.0f * t);
-
-	glm::mat4x3 controlPointsMatrix(Pos0, Pos1, Pos2, Pos3);
-
-	glm::vec3 result = controlPointsMatrix * coefficients;
-
-	return glm::normalize(result);  // Normalizacja kierunku
-}
 
 glm::vec3 Bot1Spawn = glm::vec3(2.0f, 1.0f, -1.0f);
 glm::vec3 Bot2Spawn = glm::vec3(-2.0f, 1.0f, -1.0f);
@@ -232,11 +214,8 @@ void drawObjectColor(Core::RenderContext& context, glm::mat4 modelMatrix, glm::v
 	glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
 
 	glUniform1f(glGetUniformLocation(program, "exposition"), exposition);
-
 	glUniform3f(glGetUniformLocation(program, "color"), color.x, color.y, color.z);
-
 	glUniform3f(glGetUniformLocation(program, "cameraPos"), cameraPos.x, cameraPos.y, cameraPos.z);
-
 	glUniform3f(glGetUniformLocation(program, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 	glUniform3f(glGetUniformLocation(program, "lightColor"), lightColor.x, lightColor.y, lightColor.z);
 
@@ -271,10 +250,8 @@ void drawObjectTextureNormal(Core::RenderContext& context, glm::mat4 modelMatrix
 	glUniform3f(glGetUniformLocation(programTexNormal, "cameraPos"), cameraPos.x, cameraPos.y, cameraPos.z);
 	glUniform3f(glGetUniformLocation(programTexNormal, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 
-	// Aktywuj jednostkê teksturowania nr 0 dla kolorowej tekstury
 	Core::SetActiveTexture(textureID, "colorTexture", programTexNormal, 0);
 
-	// Aktywuj jednostkê teksturowania nr 1 dla mapy normalnej
 	Core::SetActiveTexture(normalmapId, "normalSampler", programTexNormal, 1);
 
 
@@ -417,29 +394,11 @@ void renderScene(GLFWwindow* window)
 		0.,0.,0.,1.,
 		});
 
-	// Mars
-	//drawObjectTexture(sphereContext, glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(4.f, 0, 0)) * glm::scale(glm::vec3(0.3f)), texture::mars);
-
-	//drawObjectProc(sphereContext,
-		//glm::eulerAngleY(time / 2) * glm::translate(glm::vec3(2.f, 2.f, 0)) * glm::scale(glm::vec3(0.3f)),
-		//glm::vec3(1.0, 0.0, 0.0), glm::vec3(1.0, 1.0, 0.0));
-
-	//drawObjectTexture(sphereContext, glm::eulerAngleY(time / 2) * glm::translate(glm::vec3(3.f, 0, 0)) * glm::scale(glm::vec3(0.3f)), texture::earth);
-
-	//drawObjectColor(shipContext,
-	//	glm::translate(cameraPos + 1.5 * cameraDir + cameraUp * -0.5f) * inveseCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()),
-	//	glm::vec3(0.3, 0.3, 0.5)
-	//	);
-	// 
 	// Player
 	drawObjectShip(shipContext,
 		glm::translate(spaceshipPos) * spaceshipCameraRotationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1)),
 		texture::spaceship, texture::spaceship_normal
-	);/*
-	drawObjectColor(shipContext,
-		glm::translate(spaceshipPos) * spaceshipCameraRotationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1)),
-		glm::vec3(0.3, 0.3, 0.5)
-	);*/
+	);
 
 	// Bot1
 	drawObjectShip(shipContext,
@@ -475,18 +434,6 @@ void renderScene(GLFWwindow* window)
 		glm::vec3(0.5, 0.2, 0.0)
 	);
 
-
-	// Earth
-	//drawObjectTexture(sphereContext, glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(4.f, 0, 0)) * glm::eulerAngleY(time) * glm::scale(glm::vec3(0.3f)), texture::earth);
-
-	
-
-	// Moon
-	/*
-	drawObjectTexture(sphereContext,
-		glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(4.f, 0, 2.0f)) * glm::eulerAngleY(time) * glm::translate(glm::vec3(1.f, 0, 0)) * glm::scale(glm::vec3(0.1f)), texture::moon);
-	*/
-
 	// Moon_Normal
 	drawObjectTextureNormal(sphereContext,
 		/*glm::eulerAngleY(time / 3) * */ glm::translate(glm::vec3(3.f, 0, 2.0f)) * /*glm::eulerAngleY(time) * */ glm::translate(glm::vec3(1.f, 0, 0)) * glm::scale(glm::vec3(0.1f)), texture::moon, texture::moon_normal);
@@ -495,11 +442,33 @@ void renderScene(GLFWwindow* window)
 	drawObjectTextureNormal(sphereContext,
 		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(5.f, 0, 0)) * glm::scale(glm::vec3(0.3f)), texture::earth2, texture::earth2_normal);
 
-	// Earth 
-	/*
-	drawEarth(sphereContext, 
-		glm::eulerAngleY(time / 1) * glm::translate(glm::vec3(2.f, 0, 0)) * glm::scale(glm::vec3(0.3f)), texture::earth, texture::clouds);
-	*/
+	//Brain
+	drawObjectTextureNormal(sphereContext,
+		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, 2, 0)) * glm::scale(glm::vec3(0.3f)), texture::brain, texture::brain_normal);
+	//Tiles
+	drawObjectTextureNormal(sphereContext,
+		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -2, 0)) * glm::scale(glm::vec3(0.3f)), texture::tiles, texture::tiles_normal);
+	//Brick
+	drawObjectTextureNormal(sphereContext,
+		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, 0, 0)) * glm::scale(glm::vec3(0.3f)), texture::brick, texture::brick_normal);
+	//Foam
+	drawObjectTextureNormal(sphereContext,
+		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -4, 0)) * glm::scale(glm::vec3(0.3f)), texture::foam, texture::foam_normal);
+	//Gold
+	drawObjectTextureNormal(sphereContext,
+		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, 4, 0)) * glm::scale(glm::vec3(0.3f)), texture::gold, texture::gold_normal);
+	//Rock
+	drawObjectTextureNormal(sphereContext,
+		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -6, 0)) * glm::scale(glm::vec3(0.3f)), texture::rock, texture::rock_normal);
+	//Rock2
+	drawObjectTextureNormal(sphereContext,
+		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, 6, 0)) * glm::scale(glm::vec3(0.3f)), texture::rock2, texture::rock2_normal);
+	//Rope
+	drawObjectTextureNormal(sphereContext,
+		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -2, 0)) * glm::scale(glm::vec3(0.3f)), texture::rope, texture::rope_normal);
+	//Sand
+	drawObjectTextureNormal(sphereContext,
+		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -2, 0)) * glm::scale(glm::vec3(0.3f)), texture::sand, texture::sand_normal);
 
 	spotlightPos = spaceshipPos + 0.5 * spaceshipDir;
 	spotlightConeDir = spaceshipDir;
@@ -547,8 +516,6 @@ void init(GLFWwindow* window)
 	loadModelToContext("./models/place1.obj", place1Context);
 	loadModelToContext("./models/place2.obj", place2Context);
 	loadModelToContext("./models/place3.obj", place3Context);
-	loadModelToContext("./models/s2.obj", s2Context);
-	loadModelToContext("./models/s3.obj", s3Context);
 
 	texture::earth = Core::LoadTexture("textures/earth.png");
 	texture::earth2 = Core::LoadTexture("textures/earth2.png");
@@ -563,6 +530,27 @@ void init(GLFWwindow* window)
 	texture::earth2_normal = Core::LoadTexture("./textures/earth2_normals.png");
 	texture::spaceship_normal = Core::LoadTexture("./textures/spaceshipPBR/StarSparrow_Normal.png");
 	texture::moon_normal = Core::LoadTexture("./textures/moon_normals.png");
+
+	//new
+	texture::brain = Core::LoadTexture("./textures/new/brain_albedo.jpg");
+	texture::brain_normal = Core::LoadTexture("./textures/new/brain_normal.jpg");
+	texture::rope = Core::LoadTexture("./textures/new/rope_albedo.jpg");
+	texture::rope_normal = Core::LoadTexture("./textures/new/rope_normal.jpg");
+	texture::sand = Core::LoadTexture("./textures/new/sand_albedo.jpg");
+	texture::sand_normal = Core::LoadTexture("./textures/new/sand_normal.jpg");
+	texture::brick = Core::LoadTexture("./textures/new/brick_albedo.jpg");
+	texture::brick_normal = Core::LoadTexture("./textures/new/brick_normal.jpg");
+	texture::foam = Core::LoadTexture("./textures/new/foam_albedo.jpg");
+	texture::foam_normal = Core::LoadTexture("./textures/new/foam_normal.jpg");
+	texture::gold = Core::LoadTexture("./textures/new/gold_albedo.jpg");
+	texture::gold_normal = Core::LoadTexture("./textures/new/gold_normal.jpg");
+	texture::rock = Core::LoadTexture("./textures/new/rock_albedo.jpg");
+	texture::rock_normal = Core::LoadTexture("./textures/new/rock_normal.jpg");
+	texture::rock2 = Core::LoadTexture("./textures/new/rock2_albedo.jpg");
+	texture::rock2_normal = Core::LoadTexture("./textures/new/rock2_normal.jpg");
+	texture::tiles = Core::LoadTexture("./textures/new/tiles_albedo.jpg");
+	texture::tiles_normal = Core::LoadTexture("./textures/new/tiles_normal.jpg");
+
 
 	std::vector<std::string> skyboxTextures = {
 	"./textures/skybox/space_rt.png",
@@ -590,7 +578,6 @@ void shutdown(GLFWwindow* window)
 	shaderLoader.DeleteProgram(programShip);
 }
 
-//obsluga wejscia
 void processInput(GLFWwindow* window)
 {
 	glm::vec3 spaceshipSide = glm::normalize(glm::cross(spaceshipDir, glm::vec3(0.f, 1.f, 0.f)));
@@ -752,18 +739,9 @@ void processInput(GLFWwindow* window)
 // main loop
 void renderLoop(GLFWwindow* window) {
 
-	//botRaceStarted = true;
-
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
-
-		//if (botRaceStarted)
-		//{
-			// Kod do obs³ugi ruchu botów
-			
-		//}
-
 
 		renderScene(window);
 		

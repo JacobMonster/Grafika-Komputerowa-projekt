@@ -25,7 +25,6 @@
   <ItemGroup>
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\race.hpp" />
-    <ClInclude Include="src\MenuRenderer.h" />
     <ClInclude Include="src\objload.h" />
     <ClInclude Include="src\Render_Utils.h" />
     <ClInclude Include="src\Shader_Loader.h" />
@@ -35,6 +34,7 @@
     <ClInclude Include="src\SOIL\stbi_DDS_aug.h" />
     <ClInclude Include="src\SOIL\stbi_DDS_aug_c.h" />
     <ClInclude Include="src\SOIL\stb_image_aug.h" />
+    <ClInclude Include="src\spline.hpp" />
     <ClInclude Include="src\Texture.h" />
   </ItemGroup>
   <ItemGroup>
@@ -42,12 +42,14 @@
     <None Include="shaders\shader_5_1.vert" />
     <None Include="shaders\shader_5_1_tex.frag" />
     <None Include="shaders\shader_5_1_tex.vert" />
-    <None Include="shaders\shader_5_sun.frag" />
-    <None Include="shaders\shader_5_sun.vert" />
     <None Include="shaders\shader_5_tex.frag" />
     <None Include="shaders\shader_5_tex_normal.frag" />
     <None Include="shaders\shader_5_tex.vert" />
     <None Include="shaders\shader_5_tex_normal.vert" />
+    <None Include="shaders\shader_8_1.frag" />
+    <None Include="shaders\shader_8_1.vert" />
+    <None Include="shaders\shader_8_sun.frag" />
+    <None Include="shaders\shader_8_sun.vert" />
     <None Include="shaders\shader_earth.frag" />
     <None Include="shaders\shader_earth.vert" />
     <None Include="shaders\shader_proc_tex.frag" />
