@@ -23,7 +23,12 @@ int main(int argc, char** argv)
 #endif
 
 	// tworzenie okna za pomoca glfw
-	GLFWwindow* window = glfwCreateWindow(500, 500, "FirstWindow", NULL, NULL);
+	GLFWmonitor* primaryMonitor = glfwGetPrimaryMonitor();
+	// Pobranie parametrów monitora
+	const GLFWvidmode* mode = glfwGetVideoMode(primaryMonitor);
+
+	// Tworzenie okna w trybie pe³noekranowym z parametrami monitora
+	GLFWwindow* window = glfwCreateWindow(mode->width, mode->height, "FirstWindow", primaryMonitor, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -34,7 +39,7 @@ int main(int argc, char** argv)
 
 	// ladowanie OpenGL za pomoca glew
 	glewInit();
-	glViewport(0, 0, 500, 500);
+	glViewport(0, 0, mode->width, mode->height);
 
 	init(window);
 
