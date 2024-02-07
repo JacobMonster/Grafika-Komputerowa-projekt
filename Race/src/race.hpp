@@ -64,14 +64,24 @@ namespace texture {
 	GLuint sand_normal;
 	GLuint water;
 	GLuint water_normal;
+	GLuint water_arm;
 	GLuint grass;
 	GLuint grass_normal;
+	GLuint grass_arm;
 	GLuint mud;
 	GLuint mud_normal;
+	GLuint mud_arm;
 	GLuint moss;
 	GLuint moss_normal;
+	GLuint moss_arm;
 	GLuint ground;
 	GLuint ground_normal;
+
+	GLuint panel;
+	GLuint panel_normal;
+	GLuint panel_metallic;
+	GLuint panel_roughness;
+	GLuint panel_ao;
 }
 
 GLuint program;
@@ -308,18 +318,6 @@ void drawObjectColor(Core::RenderContext& context, glm::mat4 modelMatrix, glm::v
 
 }
 
-void drawObjectTexture(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureID) {
-	glUseProgram(programTex);
-	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
-	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
-	glUniformMatrix4fv(glGetUniformLocation(programTex, "transformation"), 1, GL_FALSE, (float*)&transformation);
-	glUniformMatrix4fv(glGetUniformLocation(programTex, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
-	glUniform3f(glGetUniformLocation(programTex, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
-	Core::SetActiveTexture(textureID, "colorTexture", programTex, 0);
-	Core::DrawContext(context);
-
-}
-
 void drawObjectTextureNormal(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureID, GLuint normalmapId) {
 	glUseProgram(programTexNormal);
 
@@ -404,16 +402,44 @@ void drawEarth(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textu
 
 }
 
-void drawObjectProc(Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec3 color1, glm::vec3 color2) {
+void drawObjectPBR(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureID, GLuint normalmapId, GLuint armId) {
 
 	glUseProgram(programProcTex);
+
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
 	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
+
 	glUniformMatrix4fv(glGetUniformLocation(programProcTex, "transformation"), 1, GL_FALSE, (float*)&transformation);
 	glUniformMatrix4fv(glGetUniformLocation(programProcTex, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
-	glUniform3f(glGetUniformLocation(programProcTex, "color1"), color1.x, color1.y, color1.z);
-	glUniform3f(glGetUniformLocation(programProcTex, "color2"), color2.x, color2.y, color2.z);
+	glUniform3f(glGetUniformLocation(programProcTex, "cameraPos"), cameraPos.x, cameraPos.y, cameraPos.z);
 	glUniform3f(glGetUniformLocation(programProcTex, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+
+	Core::SetActiveTexture(textureID, "colorTexture", programProcTex, 0);
+	Core::SetActiveTexture(normalmapId, "normalSampler", programProcTex, 1);
+	Core::SetActiveTexture(armId, "armTexture", programProcTex, 2);
+
+	Core::DrawContext(context);
+
+}
+
+void drawObjectPBR2(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureID, GLuint normalmapId, GLuint metallicId, GLuint roughnessId, GLuint aoId) {
+	glUseProgram(programTex);
+
+	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
+	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
+
+	glUniformMatrix4fv(glGetUniformLocation(programTex, "transformation"), 1, GL_FALSE, (float*)&transformation);
+	glUniformMatrix4fv(glGetUniformLocation(programTex, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
+	glUniform3f(glGetUniformLocation(programTex, "cameraPos"), cameraPos.x, cameraPos.y, cameraPos.z);
+	glUniform3f(glGetUniformLocation(programTex, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+
+	Core::SetActiveTexture(textureID, "albedoTexture", programTex, 0);
+	Core::SetActiveTexture(normalmapId, "normalTexture", programTex, 1);
+	Core::SetActiveTexture(aoId, "aoTexture", programTex, 2);
+	Core::SetActiveTexture(roughnessId, "roughnessTexture", programTex, 3);
+	Core::SetActiveTexture(metallicId, "metallicTexture", programTex, 4);
+	
+
 	Core::DrawContext(context);
 
 }
@@ -570,6 +596,12 @@ void renderScene(GLFWwindow* window)
 	renderPlanets(texture::moss, texture::moss_normal, 43, time);
 	//renderPlanets(texture::ground, texture::ground_normal, 2.0f);
 
+	drawObjectColor(sphereContext, glm::translate(glm::vec3(-6.f, 0.0f, -25.0f)), glm::vec3(1.0, 0.0, 0.0), lightPos);
+	drawObjectPBR(sphereContext, glm::translate(glm::vec3(-2.f, 0.0f, -25.0f)), texture::moss, texture::moss_normal, texture::moss_arm);
+	drawObjectPBR(sphereContext, glm::translate(glm::vec3(2.f, 0.0f, -25.0f)), texture::mud, texture::mud_normal, texture::mud_arm);
+	//drawObjectPBR(sphereContext, glm::translate(glm::vec3(-4.f, 0.0f, -20.0f)), texture::water, texture::water_normal, texture::water_arm);
+	//drawObjectPBR2(sphereContext, glm::translate(glm::vec3(-6.f, 0.0f, -20.0f)), texture::panel, texture::panel_normal, texture::panel_metallic, texture::panel_roughness, texture::panel_ao);
+
 	spotlightPos = spaceshipPos + 0.5 * spaceshipDir;
 	spotlightConeDir = spaceshipDir;
 
@@ -652,15 +684,24 @@ void init(GLFWwindow* window)
 	texture::rock2_normal = Core::LoadTexture("./textures/new/rock2_normal.jpg");
 	texture::tiles = Core::LoadTexture("./textures/new/tiles_albedo.jpg");
 	texture::tiles_normal = Core::LoadTexture("./textures/new/tiles_normal.jpg");
+	texture::panel = Core::LoadTexture("./textures/new/panel_albedo.jpg");
+	texture::panel_normal = Core::LoadTexture("./textures/new/panel_normal.jpg");
+	texture::panel_metallic = Core::LoadTexture("./textures/new/panel_metallic.jpg");
+	texture::panel_roughness = Core::LoadTexture("./textures/new/panel_roughness.jpg");
+	texture::panel_ao = Core::LoadTexture("./textures/new/panel_ao.jpg");
 
 	texture::water = Core::LoadTexture("./textures/water/Pool_Water_Texture_Diff.jpg");
 	texture::water_normal = Core::LoadTexture("./textures/water/Pool_Water_Texture_nrml.jpg");
+	texture::water_arm = Core::LoadTexture("./textures/water/Pool_Water_Texture_arm.jpg");
 	texture::grass = Core::LoadTexture("./textures/grassy/coast_sand_rocks_02_diff_1k.jpg");
 	texture::grass_normal = Core::LoadTexture("./textures/grassy/coast_sand_rocks_02_nor_gl_1k.jpg");
+	texture::grass_arm = Core::LoadTexture("./textures/grassy/coast_sand_rocks_02_arm_1k.jpg");
 	texture::moss = Core::LoadTexture("./textures/mossy_rock/mossy_rock_diff_1k.jpg");
 	texture::moss_normal = Core::LoadTexture("./textures/mossy_rock/mossy_rock_nor_gl_1k.jpg");
+	texture::moss_arm = Core::LoadTexture("./textures/mud/mossy_rock_arm_1k.jpg");
 	texture::mud = Core::LoadTexture("./textures/mud/brown_mud_03_diff_1k.jpg");
 	texture::mud_normal = Core::LoadTexture("./textures/mud/brown_mud_03_nor_gl_1k.jpg");
+	texture::mud_arm = Core::LoadTexture("./textures/mud/brown_mud_03_arm_1k.jpg");
 	texture::ground = Core::LoadTexture("./textures/rocks_ground/rocks_ground_01_diff_1k.jpg");
 	texture::ground_normal = Core::LoadTexture("./textures/rock_ground/rocks_ground_01_nor_gl_1k.jpg");
 
