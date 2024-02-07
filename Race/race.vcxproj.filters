@@ -92,6 +92,9 @@
     <ClInclude Include="src\spline.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\planets.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\shader_5_1.frag">

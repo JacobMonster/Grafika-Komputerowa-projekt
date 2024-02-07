@@ -4,91 +4,91 @@ C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(1
   C:\Users\tobip\source\repos\grafika\projekt\dependencies\glfw-3.3.8.bin.WIN32\include\GLFW\glfw3.h(123,1):
   zobacz poprzednią definicję „APIENTRY”
   
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(236,20): warning C4305: "inicjowanie": obcięcie z "double" do "float"
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(246,20): warning C4305: "inicjowanie": obcięcie z "double" do "float"
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(450,13): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(460,13): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(467,124): warning C4305: "argument": obcięcie z "double" do "T"
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(467,124): warning C4305:         with
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(467,124): warning C4305:         [
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(467,124): warning C4305:             T=float
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(467,124): warning C4305:         ]
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(477,124): warning C4305: "argument": obcięcie z "double" do "T"
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(477,124): warning C4305:         with
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(477,124): warning C4305:         [
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(477,124): warning C4305:             T=float
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(477,124): warning C4305:         ]
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(473,122): warning C4305: "argument": obcięcie z "double" do "T"
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(473,122): warning C4305:         with
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(473,122): warning C4305:         [
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(473,122): warning C4305:             T=float
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(473,122): warning C4305:         ]
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(483,122): warning C4305: "argument": obcięcie z "double" do "T"
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(483,122): warning C4305:         with
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(483,122): warning C4305:         [
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(483,122): warning C4305:             T=float
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(483,122): warning C4305:         ]
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(479,122): warning C4305: "argument": obcięcie z "double" do "T"
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(479,122): warning C4305:         with
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(479,122): warning C4305:         [
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(479,122): warning C4305:             T=float
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(479,122): warning C4305:         ]
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(489,122): warning C4305: "argument": obcięcie z "double" do "T"
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(489,122): warning C4305:         with
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(489,122): warning C4305:         [
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(489,122): warning C4305:             T=float
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(489,122): warning C4305:         ]
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(738,14): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(775,14): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(739,14): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(776,14): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(784,70): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(821,70): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(784,90): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(821,90): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(784,112): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(821,112): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(784,134): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(821,134): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(785,80): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(822,80): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(785,100): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(822,100): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(785,122): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(822,122): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(785,144): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(822,144): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(852,70): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(889,70): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(852,90): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(889,90): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(852,112): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(889,112): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(852,134): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(889,134): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(853,80): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(890,80): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(853,100): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(890,100): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(853,122): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(890,122): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(853,144): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(890,144): warning C4244: "argument": konwersja z "float" do "const unsigned int", możliwa utrata danych
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(871,21): warning C4305: "-=": obcięcie z "double" do "float"
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(908,21): warning C4305: "-=": obcięcie z "double" do "float"
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
-C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(873,21): warning C4305: "+=": obcięcie z "double" do "float"
+C:\Users\tobip\source\repos\grafika\projekt\Race\src\race.hpp(910,21): warning C4305: "+=": obcięcie z "double" do "float"
   (kompilowanie pliku źródłowego „src/main.cpp”)
   
 Box.obj : warning LNK4075: zignorowano opcję „/EDITANDCONTINUE” z powodu określenia opcji „/INCREMENTAL:NO”

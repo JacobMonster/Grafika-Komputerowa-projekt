@@ -49,8 +49,8 @@ namespace texture {
 	GLuint tiles_normal;
 	GLuint brick;
 	GLuint brick_normal;
-	GLuint foam;
-	GLuint foam_normal;
+	GLuint stone;
+	GLuint stone_normal;
 	GLuint gold;
 	GLuint gold_normal;
 	GLuint rock;
@@ -61,6 +61,16 @@ namespace texture {
 	GLuint rope_normal;
 	GLuint sand;
 	GLuint sand_normal;
+	GLuint water;
+	GLuint water_normal;
+	GLuint grass;
+	GLuint grass_normal;
+	GLuint mud;
+	GLuint mud_normal;
+	GLuint moss;
+	GLuint moss_normal;
+	GLuint ground;
+	GLuint ground_normal;
 }
 
 GLuint program;
@@ -522,34 +532,49 @@ void renderScene(GLFWwindow* window)
 	//Earth_Normal
 	drawObjectTextureNormal(sphereContext,
 		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(5.f, 0, 0)) * glm::scale(glm::vec3(0.3f)), texture::earth2, texture::earth2_normal);
-
+	
+	//Water
+	drawObjectTextureNormal(sphereContext,
+		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, 8, 0)) * glm::scale(glm::vec3(0.3f)), texture::water, texture::water_normal);
 	//Brain
 	drawObjectTextureNormal(sphereContext,
-		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, 2, 0)) * glm::scale(glm::vec3(0.3f)), texture::brain, texture::brain_normal);
+		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, 6, 0)) * glm::scale(glm::vec3(0.3f)), texture::brain, texture::brain_normal);
 	//Tiles
 	drawObjectTextureNormal(sphereContext,
-		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -2, 0)) * glm::scale(glm::vec3(0.3f)), texture::tiles, texture::tiles_normal);
+		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, 4, 0)) * glm::scale(glm::vec3(0.3f)), texture::tiles, texture::tiles_normal);
 	//Brick
 	drawObjectTextureNormal(sphereContext,
-		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, 0, 0)) * glm::scale(glm::vec3(0.3f)), texture::brick, texture::brick_normal);
-	//Foam
+		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, 2, 0)) * glm::scale(glm::vec3(0.3f)), texture::brick, texture::brick_normal);
+	//Stone
 	drawObjectTextureNormal(sphereContext,
-		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -4, 0)) * glm::scale(glm::vec3(0.3f)), texture::foam, texture::foam_normal);
+		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, 0, 0)) * glm::scale(glm::vec3(0.3f)), texture::stone, texture::stone_normal);
 	//Gold
 	drawObjectTextureNormal(sphereContext,
-		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, 4, 0)) * glm::scale(glm::vec3(0.3f)), texture::gold, texture::gold_normal);
+		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -2, 0)) * glm::scale(glm::vec3(0.3f)), texture::gold, texture::gold_normal);
 	//Rock
 	drawObjectTextureNormal(sphereContext,
-		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -6, 0)) * glm::scale(glm::vec3(0.3f)), texture::rock, texture::rock_normal);
+		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -4, 0)) * glm::scale(glm::vec3(0.3f)), texture::rock, texture::rock_normal);
 	//Rock2
 	drawObjectTextureNormal(sphereContext,
-		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, 6, 0)) * glm::scale(glm::vec3(0.3f)), texture::rock2, texture::rock2_normal);
+		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -6, 0)) * glm::scale(glm::vec3(0.3f)), texture::rock2, texture::rock2_normal);
 	//Rope
 	drawObjectTextureNormal(sphereContext,
-		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -2, 0)) * glm::scale(glm::vec3(0.3f)), texture::rope, texture::rope_normal);
+		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -8, 0)) * glm::scale(glm::vec3(0.3f)), texture::rope, texture::rope_normal);
 	//Sand
 	drawObjectTextureNormal(sphereContext,
-		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -2, 0)) * glm::scale(glm::vec3(0.3f)), texture::sand, texture::sand_normal);
+		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -10, 0)) * glm::scale(glm::vec3(0.3f)), texture::sand, texture::sand_normal);
+	//Grass
+	drawObjectTextureNormal(sphereContext,
+		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -12, 0)) * glm::scale(glm::vec3(0.3f)), texture::grass, texture::grass_normal);
+	//Mud
+	drawObjectTextureNormal(sphereContext,
+		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -14, 0))* glm::scale(glm::vec3(0.3f)), texture::mud, texture::mud_normal);
+	//Moss
+	drawObjectTextureNormal(sphereContext,
+		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -16, 0))* glm::scale(glm::vec3(0.3f)), texture::moss, texture::moss_normal);
+	//Ground
+	drawObjectTextureNormal(sphereContext,
+		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -18, 0)) * glm::scale(glm::vec3(0.3f)), texture::ground, texture::ground_normal);
 
 	spotlightPos = spaceshipPos + 0.5 * spaceshipDir;
 	spotlightConeDir = spaceshipDir;
@@ -623,8 +648,8 @@ void init(GLFWwindow* window)
 	texture::sand_normal = Core::LoadTexture("./textures/new/sand_normal.jpg");
 	texture::brick = Core::LoadTexture("./textures/new/brick_albedo.jpg");
 	texture::brick_normal = Core::LoadTexture("./textures/new/brick_normal.jpg");
-	texture::foam = Core::LoadTexture("./textures/new/foam_albedo.jpg");
-	texture::foam_normal = Core::LoadTexture("./textures/new/foam_normal.jpg");
+	texture::stone = Core::LoadTexture("./textures/new/stone_albedo.jpg");
+	texture::stone_normal = Core::LoadTexture("./textures/new/stone_normal.jpg");
 	texture::gold = Core::LoadTexture("./textures/new/gold_albedo.jpg");
 	texture::gold_normal = Core::LoadTexture("./textures/new/gold_normal.jpg");
 	texture::rock = Core::LoadTexture("./textures/new/rock_albedo.jpg");
@@ -633,6 +658,18 @@ void init(GLFWwindow* window)
 	texture::rock2_normal = Core::LoadTexture("./textures/new/rock2_normal.jpg");
 	texture::tiles = Core::LoadTexture("./textures/new/tiles_albedo.jpg");
 	texture::tiles_normal = Core::LoadTexture("./textures/new/tiles_normal.jpg");
+
+	texture::water = Core::LoadTexture("./textures/water/Pool_Water_Texture_Diff.jpg");
+	texture::water_normal = Core::LoadTexture("./textures/water/Pool_Water_Texture_nrml.jpg");
+	texture::grass = Core::LoadTexture("./textures/grassy/coast_sand_rocks_02_diff_1k.jpg");
+	texture::grass_normal = Core::LoadTexture("./textures/grassy/coast_sand_rocks_02_nor_gl_1k.jpg");
+	texture::moss = Core::LoadTexture("./textures/mossy_rock/mossy_rock_diff_1k.jpg");
+	texture::moss_normal = Core::LoadTexture("./textures/mossy_rock/mossy_rock_nor_gl_1k.jpg");
+	texture::mud = Core::LoadTexture("./textures/mud/brown_mud_03_diff_1k.jpg");
+	texture::mud_normal = Core::LoadTexture("./textures/mud/brown_mud_03_nor_gl_1k.jpg");
+	texture::ground = Core::LoadTexture("./textures/rocks_ground/rocks_ground_01_diff_1k.jpg");
+	texture::ground_normal = Core::LoadTexture("./textures/rock_ground/rocks_ground_01_nor_gl_1k.jpg");
+
 
 
 	std::vector<std::string> skyboxTextures = {
