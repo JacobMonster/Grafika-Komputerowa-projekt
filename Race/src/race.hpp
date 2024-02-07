@@ -20,6 +20,7 @@
 #include <chrono>
 
 #include "spline.hpp"
+#include "planets.hpp"
 
 
 namespace texture {
@@ -345,6 +346,20 @@ void drawObjectTextureNormal(Core::RenderContext& context, glm::mat4 modelMatrix
 	Core::DrawContext(context);
 }
 
+void drawObjectSun(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureID) {
+	glUseProgram(programSun);
+
+	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
+	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
+
+	glUniformMatrix4fv(glGetUniformLocation(programSun, "transformation"), 1, GL_FALSE, glm::value_ptr(transformation));
+	glUniformMatrix4fv(glGetUniformLocation(programSun, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+
+	Core::SetActiveTexture(textureID, "colorTexture", programSun, 0);
+
+
+	Core::DrawContext(context);
+}
 void drawObjectShip(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureID, GLuint normalmapId) {
 	glUseProgram(programShip);
 
@@ -449,6 +464,12 @@ GLuint loadCubeMap(const std::vector<std::string>& filePaths)
 	return textureID;
 }
 
+void renderPlanets(GLuint textureId, GLuint normalId, int x, float time) {
+	drawObjectTextureNormal(sphereContext, glm::translate(positions[x-1]) * glm::scale(glm::vec3(0.2f)), textureId, normalId);
+	drawObjectTextureNormal(sphereContext, glm::eulerAngleY(time / 3) * glm::translate(positions[x]) * glm::scale(glm::vec3(0.5f)), textureId, normalId);
+	drawObjectTextureNormal(sphereContext, glm::translate(positions[x+1]) * glm::scale(glm::vec3(0.8f)), textureId, normalId);
+}
+
 void renderScene(GLFWwindow* window)
 {
 	glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
@@ -526,57 +547,28 @@ void renderScene(GLFWwindow* window)
 		glm::vec3(1.0, 1.0, 1.0), cameraPos
 	);
 
+	//Sun
+	drawObjectSun(sphereContext,
+		glm::translate(lightPos),
+		texture::sun
+	);
 
-	// Moon_Normal
-	drawObjectTextureNormal(sphereContext,
-		/*glm::eulerAngleY(time / 3) * */ glm::translate(glm::vec3(3.f, 0, 2.0f)) * /*glm::eulerAngleY(time) * */ glm::translate(glm::vec3(1.f, 0, 0)) * glm::scale(glm::vec3(0.1f)), texture::moon, texture::moon_normal);
-
-	//Earth_Normal
-	drawObjectTextureNormal(sphereContext,
-		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(5.f, 0, 0)) * glm::scale(glm::vec3(0.3f)), texture::earth2, texture::earth2_normal);
-	
-	//Water
-	drawObjectTextureNormal(sphereContext,
-		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, 8, 0)) * glm::scale(glm::vec3(0.3f)), texture::water, texture::water_normal);
-	//Brain
-	drawObjectTextureNormal(sphereContext,
-		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, 6, 0)) * glm::scale(glm::vec3(0.3f)), texture::brain, texture::brain_normal);
-	//Tiles
-	drawObjectTextureNormal(sphereContext,
-		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, 4, 0)) * glm::scale(glm::vec3(0.3f)), texture::tiles, texture::tiles_normal);
-	//Brick
-	drawObjectTextureNormal(sphereContext,
-		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, 2, 0)) * glm::scale(glm::vec3(0.3f)), texture::brick, texture::brick_normal);
-	//Stone
-	drawObjectTextureNormal(sphereContext,
-		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, 0, 0)) * glm::scale(glm::vec3(0.3f)), texture::stone, texture::stone_normal);
-	//Gold
-	drawObjectTextureNormal(sphereContext,
-		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -2, 0)) * glm::scale(glm::vec3(0.3f)), texture::gold, texture::gold_normal);
-	//Rock
-	drawObjectTextureNormal(sphereContext,
-		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -4, 0)) * glm::scale(glm::vec3(0.3f)), texture::rock, texture::rock_normal);
-	//Rock2
-	drawObjectTextureNormal(sphereContext,
-		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -6, 0)) * glm::scale(glm::vec3(0.3f)), texture::rock2, texture::rock2_normal);
-	//Rope
-	drawObjectTextureNormal(sphereContext,
-		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -8, 0)) * glm::scale(glm::vec3(0.3f)), texture::rope, texture::rope_normal);
-	//Sand
-	drawObjectTextureNormal(sphereContext,
-		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -10, 0)) * glm::scale(glm::vec3(0.3f)), texture::sand, texture::sand_normal);
-	//Grass
-	drawObjectTextureNormal(sphereContext,
-		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -12, 0)) * glm::scale(glm::vec3(0.3f)), texture::grass, texture::grass_normal);
-	//Mud
-	drawObjectTextureNormal(sphereContext,
-		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -14, 0))* glm::scale(glm::vec3(0.3f)), texture::mud, texture::mud_normal);
-	//Moss
-	drawObjectTextureNormal(sphereContext,
-		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -16, 0))* glm::scale(glm::vec3(0.3f)), texture::moss, texture::moss_normal);
-	//Ground
-	drawObjectTextureNormal(sphereContext,
-		/*glm::eulerAngleY(time / 1) * */ glm::translate(glm::vec3(6.f, -18, 0)) * glm::scale(glm::vec3(0.3f)), texture::ground, texture::ground_normal);
+	renderPlanets(texture::earth2, texture::earth2_normal, 1, time);
+	renderPlanets(texture::water, texture::water_normal, 4, time);
+	renderPlanets(texture::moon, texture::moon_normal, 7, time);
+	renderPlanets(texture::tiles, texture::tiles_normal, 10, time);
+	renderPlanets(texture::brick, texture::brick_normal, 13, time);
+	renderPlanets(texture::stone, texture::stone_normal, 16, time);
+	renderPlanets(texture::gold, texture::gold_normal, 19, time);
+	renderPlanets(texture::rock, texture::rock_normal, 22, time);
+	renderPlanets(texture::rock2, texture::rock2_normal, 25, time);
+	renderPlanets(texture::rope, texture::rope_normal, 28, time);
+	renderPlanets(texture::sand, texture::sand_normal, 31, time);
+	renderPlanets(texture::grass, texture::grass_normal, 34, time);
+	renderPlanets(texture::brain, texture::brain_normal, 37, time);
+	renderPlanets(texture::mud, texture::mud_normal, 40, time);
+	renderPlanets(texture::moss, texture::moss_normal, 43, time);
+	//renderPlanets(texture::ground, texture::ground_normal, 2.0f);
 
 	spotlightPos = spaceshipPos + 0.5 * spaceshipDir;
 	spotlightConeDir = spaceshipDir;
@@ -632,7 +624,7 @@ void init(GLFWwindow* window)
 	texture::moon = Core::LoadTexture("textures/moon.jpg");
 	texture::clouds = Core::LoadTexture("./textures/clouds.jpg");
 	texture::grid = Core::LoadTexture("./textures/grid.png");
-	texture::sun = Core::LoadTexture("./textures/sun.jg");
+	texture::sun = Core::LoadTexture("./textures/sunmap.jpg");
 	texture::mars = Core::LoadTexture("./textures/mars.jpg");
 	texture::spaceship = Core::LoadTexture("./textures/spaceshipPBR/StarSparrow_albedo.png");
 
@@ -675,12 +667,12 @@ void init(GLFWwindow* window)
 
 
 	std::vector<std::string> skyboxTextures = {
-	"./textures/skybox/space_rt.png",
-	"./textures/skybox/space_lf.png",
-	"./textures/skybox/space_up.png",
-	"./textures/skybox/space_dn.png",
-	"./textures/skybox/space_ft.png",
-	"./textures/skybox/space_bk.png"
+	"./textures/skybox/right.png",
+	"./textures/skybox/left.png",
+	"./textures/skybox/top.png",
+	"./textures/skybox/bottom.png",
+	"./textures/skybox/front.png",
+	"./textures/skybox/back.png"
 	};
 
 	cubemapTexture = loadCubeMap(skyboxTextures);
@@ -704,7 +696,6 @@ void processInput(GLFWwindow* window)
 {
 	glm::vec3 spaceshipSide = glm::normalize(glm::cross(spaceshipDir, glm::vec3(0.f, 1.f, 0.f)));
 	glm::vec3 spaceshipUp = glm::vec3(0.f, 1.f, 0.f);
-
 	float time = glfwGetTime();
 	deltaTime = time - lastFrameTime;
 	lastFrameTime = time;
@@ -712,7 +703,6 @@ void processInput(GLFWwindow* window)
 
 	float angleSpeed = 2.f / fps;
 	float moveSpeed = 4.5f / fps;
-	
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
@@ -787,36 +777,6 @@ void processInput(GLFWwindow* window)
 	//spaceshipPos = Bot1Pos;
 	//std::cout << "tBot1: " << tBot1 << ", " << "Time: " << raceStartTime << ")\n";
 
-	//if (tBot1 < 1.0f) {
-	//	Bot1Pos = CalculateCatmullRomSpline(tBot1, Bot1Spawn, Bot1Spawn, checkpointPos[0], checkpointPos[1]);
-	//	Bot1Dir = CalculateCatmullRomSplineDerivative(tBot1, Bot1Spawn, Bot1Spawn, checkpointPos[0], checkpointPos[1]);
-	//}
-	//else if (tBot1 < 2.0f) {
-	//	Bot1Pos = CalculateCatmullRomSpline(tBot1 - 1.0f, Bot1Spawn, checkpointPos[0], checkpointPos[1], checkpointPos[2]);
-	//	Bot1Dir = CalculateCatmullRomSplineDerivative(tBot1 - 1.0f, Bot1Spawn, checkpointPos[0], checkpointPos[1], checkpointPos[2]);
-	//}
-	//else if (tBot1 < 3.0f) {
-	//	Bot1Pos = CalculateCatmullRomSpline(tBot1 - 2.0f, checkpointPos[0], checkpointPos[1], checkpointPos[2], checkpointPos[3]);
-	//	Bot1Dir = CalculateCatmullRomSplineDerivative(tBot1 - 2.0f, checkpointPos[0], checkpointPos[1], checkpointPos[2], checkpointPos[3]);
-	//}
-	//else if (tBot1 < 4.0f) {
-	//	Bot1Pos = CalculateCatmullRomSpline(tBot1 - 3.0f, checkpointPos[1], checkpointPos[2], checkpointPos[3], checkpointPos[4]);
-	//	Bot1Dir = CalculateCatmullRomSplineDerivative(tBot1 - 3.0f, checkpointPos[1], checkpointPos[2], checkpointPos[3], checkpointPos[4]);
-	//}
-	//else if (tBot1 < 5.0f) {
-	//	Bot1Pos = CalculateCatmullRomSpline(tBot1 - 4.0f, checkpointPos[2], checkpointPos[3], checkpointPos[4], checkpointPos[5]);
-	//	Bot1Dir = CalculateCatmullRomSplineDerivative(tBot1 - 4.0f, checkpointPos[2], checkpointPos[3], checkpointPos[4], checkpointPos[5]);
-	//	if (checkpointReached2(4, Bot1Pos, calculateCheckpointRotationMatrix(checkpointPos[currentCheckpointIndex], checkpointPos[currentCheckpointIndex + 1])) && !(PlayerEnd == true)) {
-	//		Bot1End = true;
-	//		Bot1Pos = glm::vec3(-100.0f, -97.0f, -100.0f);
-	//		Bot1Dir = glm::vec3(0.0f, 0.0f, 1.0f);
-	//	}
-	//	else if (checkpointReached2(4, Bot1Pos, calculateCheckpointRotationMatrix(checkpointPos[currentCheckpointIndex], checkpointPos[currentCheckpointIndex + 1])) && (PlayerEnd == true)) {
-	//		Bot1Pos = glm::vec3(-102.2f, -97.5f, -100.0f);
-	//		Bot1Dir = glm::vec3(0.0f, 0.0f, 1.0f);
-	//	}
-	//}
-
 	if (tBot1 < 1.0f) {
 		Bot1Pos = CalculateCatmullRomSpline(tBot1, Bot1Spawn, Bot1Spawn, checkpointPos[0], checkpointPos[1]);
 		Bot1Dir = CalculateCatmullRomSplineDerivative(tBot1, Bot1Spawn, Bot1Spawn, checkpointPos[0], checkpointPos[1]);
@@ -843,42 +803,6 @@ void processInput(GLFWwindow* window)
 		Bot1Pos = glm::vec3(-102.2f, -97.5f, -100.0f);
 		Bot1Dir = glm::vec3(0.0f, 0.0f, 1.0f);
 	}
-
-
-
-	//if (tBot2 < 1.0f) {
-	//	Bot2Pos = CalculateCatmullRomSpline(tBot2, Bot2Spawn, Bot2Spawn, Bot2Spawn, checkpointPos[0]);
-	//	Bot2Dir = CalculateCatmullRomSplineDerivative(tBot2, Bot2Spawn, Bot2Spawn, Bot2Spawn, checkpointPos[0]);
-	//}
-	//else if (tBot2 < 2.0f) {
-	//	Bot2Pos = CalculateCatmullRomSpline(tBot2 - 1.0f, Bot2Spawn, Bot2Spawn, checkpointPos[0], checkpointPos[1]);
-	//	Bot2Dir = CalculateCatmullRomSplineDerivative(tBot2 - 1.0f, Bot2Spawn, Bot2Spawn, checkpointPos[0], checkpointPos[1]);
-	//}
-	//else if (tBot2 < 3.0f) {
-	//	Bot2Pos = CalculateCatmullRomSpline(tBot2 - 2.0f, Bot2Spawn, checkpointPos[0], checkpointPos[1], checkpointPos[2]);
-	//	Bot2Dir = CalculateCatmullRomSplineDerivative(tBot2 - 2.0f, Bot2Spawn, checkpointPos[0], checkpointPos[1], checkpointPos[2]);
-	//}
-	//else if (tBot2 < 4.0f) {
-	//	Bot2Pos = CalculateCatmullRomSpline(tBot2 - 3.0f, checkpointPos[0], checkpointPos[1], checkpointPos[2], checkpointPos[3]);
-	//	Bot2Dir = CalculateCatmullRomSplineDerivative(tBot2 - 3.0f, checkpointPos[0], checkpointPos[1], checkpointPos[2], checkpointPos[3]);
-	//}
-	//else if (tBot2 < 5.0f) {
-	//	Bot2Pos = CalculateCatmullRomSpline(tBot2 - 4.0f, checkpointPos[1], checkpointPos[2], checkpointPos[3], checkpointPos[4]);
-	//	Bot2Dir = CalculateCatmullRomSplineDerivative(tBot2 - 4.0f, checkpointPos[1], checkpointPos[2], checkpointPos[3], checkpointPos[4]);
-	//}
-	//else if (tBot2 < 6.0f) {
-	//	Bot2Pos = CalculateCatmullRomSpline(tBot2 - 5.0f, checkpointPos[2], checkpointPos[3], checkpointPos[4], checkpointPos[5]);
-	//	Bot2Dir = CalculateCatmullRomSplineDerivative(tBot2 - 5.0f, checkpointPos[2], checkpointPos[3], checkpointPos[4], checkpointPos[5]);
-	//	if (checkpointReached2(4, Bot2Pos, calculateCheckpointRotationMatrix(checkpointPos[currentCheckpointIndex], checkpointPos[currentCheckpointIndex + 1])) && !(PlayerEnd == true)) {
-	//		Bot2End = true;
-	//		Bot2Pos = glm::vec3(-102.2f, -97.5f, -100.0f);
-	//		Bot2Dir = glm::vec3(0.0f, 0.0f, 1.0f);
-	//	}
-	//	else if (checkpointReached2(4, Bot2Pos, calculateCheckpointRotationMatrix(checkpointPos[currentCheckpointIndex], checkpointPos[currentCheckpointIndex + 1])) && (PlayerEnd == true)) {
-	//		Bot2Pos = glm::vec3(-97.8f, -98.0f, -100.0f);
-	//		Bot2Dir = glm::vec3(0.0f, 0.0f, 1.0f);
-	//	}
-	//}
 
 	if (tBot2 < 1.0f) {
 		Bot2Pos = CalculateCatmullRomSpline(tBot2, Bot2Spawn, Bot2Spawn, Bot2Spawn, checkpointPos[0]);
