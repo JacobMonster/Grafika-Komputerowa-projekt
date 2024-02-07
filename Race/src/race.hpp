@@ -28,6 +28,8 @@ namespace texture {
 	GLuint earth2;
 	GLuint clouds;
 	GLuint moon;
+	GLuint heightmap;
+	GLuint brown;
 	GLuint ship;
 	GLuint grid;
 	GLuint spaceship;
@@ -93,6 +95,7 @@ GLuint programProcTex;
 GLuint cubemapTexture;
 GLuint programTexNormal;
 GLuint programShip;
+GLuint programH;
 
 Core::Shader_Loader shaderLoader;
 
@@ -444,6 +447,27 @@ void drawObjectPBR2(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint 
 
 }
 
+void drawObjectHeight(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureID, GLuint heightmapId, GLuint texture2Id, GLuint texture3Id) {
+
+	glUseProgram(programH);
+
+	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
+	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
+
+	glUniformMatrix4fv(glGetUniformLocation(programH, "transformation"), 1, GL_FALSE, (float*)&transformation);
+	glUniformMatrix4fv(glGetUniformLocation(programH, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
+	glUniform3f(glGetUniformLocation(programH, "cameraPos"), cameraPos.x, cameraPos.y, cameraPos.z);
+	glUniform3f(glGetUniformLocation(programH, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+
+	Core::SetActiveTexture(textureID, "moonTexture", programH, 0);
+	Core::SetActiveTexture(texture2Id, "waterTexture", programH, 1);
+	Core::SetActiveTexture(texture3Id, "sandTeture", programH, 2);
+	Core::SetActiveTexture(heightmapId, "heightMapTexture", programH, 3);
+
+	Core::DrawContext(context);
+
+}
+
 void drawSkyBox(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint cubemapTexture) {
 
 	glUseProgram(programSkyBox);
@@ -599,8 +623,10 @@ void renderScene(GLFWwindow* window)
 	drawObjectColor(sphereContext, glm::translate(glm::vec3(-6.f, 0.0f, -25.0f)), glm::vec3(1.0, 0.0, 0.0), lightPos);
 	drawObjectPBR(sphereContext, glm::translate(glm::vec3(-2.f, 0.0f, -25.0f)), texture::moss, texture::moss_normal, texture::moss_arm);
 	drawObjectPBR(sphereContext, glm::translate(glm::vec3(2.f, 0.0f, -25.0f)), texture::mud, texture::mud_normal, texture::mud_arm);
+	drawEarth(sphereContext, glm::translate(glm::vec3(6.f, 0.0f, -25.0f)), texture::earth, texture::clouds);
 	//drawObjectPBR(sphereContext, glm::translate(glm::vec3(-4.f, 0.0f, -20.0f)), texture::water, texture::water_normal, texture::water_arm);
 	//drawObjectPBR2(sphereContext, glm::translate(glm::vec3(-6.f, 0.0f, -20.0f)), texture::panel, texture::panel_normal, texture::panel_metallic, texture::panel_roughness, texture::panel_ao);
+	drawObjectHeight(sphereContext, glm::translate(glm::vec3(10.f, 0.0f, -25.0f)), texture::moon, texture::heightmap, texture::water, texture::sand);
 
 	spotlightPos = spaceshipPos + 0.5 * spaceshipDir;
 	spotlightConeDir = spaceshipDir;
@@ -639,6 +665,7 @@ void init(GLFWwindow* window)
 	programSkyBox = shaderLoader.CreateProgram("shaders/shader_skybox.vert", "shaders/shader_skybox.frag");
 	programTexNormal = shaderLoader.CreateProgram("shaders/shader_5_tex_normal.vert", "shaders/shader_5_tex_normal.frag");
 	programShip = shaderLoader.CreateProgram("shaders/shader_ship.vert", "shaders/shader_ship.frag");
+	programH = shaderLoader.CreateProgram("shaders/shader_5_1.vert", "shaders/shader_5_1.frag");
 
 
 	loadModelToContext("./models/sphere.obj", sphereContext);
@@ -654,6 +681,8 @@ void init(GLFWwindow* window)
 	texture::earth = Core::LoadTexture("textures/earth.png");
 	texture::earth2 = Core::LoadTexture("textures/earth2.png");
 	texture::moon = Core::LoadTexture("textures/moon.jpg");
+	texture::heightmap = Core::LoadTexture("textures/heightmap.png");
+	texture::brown = Core::LoadTexture("textures/moon.png");
 	texture::clouds = Core::LoadTexture("./textures/clouds.jpg");
 	texture::grid = Core::LoadTexture("./textures/grid.png");
 	texture::sun = Core::LoadTexture("./textures/sunmap.jpg");
