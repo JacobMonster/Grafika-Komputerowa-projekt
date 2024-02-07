@@ -149,6 +149,8 @@ bool Bot1Endc = false;
 bool Bot2Endc = false;
 bool PlayerEnd = false;
 float raceStartTime = 0.0f;
+float deltaTime;
+float lastFrameTime = 0.f;
 
 glm::vec3 cameraPos = glm::vec3(-4.f, 0, 0);
 glm::vec3 cameraDir = glm::vec3(1.f, 0.f, 0.f);
@@ -702,8 +704,15 @@ void processInput(GLFWwindow* window)
 {
 	glm::vec3 spaceshipSide = glm::normalize(glm::cross(spaceshipDir, glm::vec3(0.f, 1.f, 0.f)));
 	glm::vec3 spaceshipUp = glm::vec3(0.f, 1.f, 0.f);
-	float angleSpeed = 0.05f;
-	float moveSpeed = 0.05f;
+
+	float time = glfwGetTime();
+	deltaTime = time - lastFrameTime;
+	lastFrameTime = time;
+	float fps = 1 / deltaTime;
+
+	float angleSpeed = 2.f / fps;
+	float moveSpeed = 4.5f / fps;
+	
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
