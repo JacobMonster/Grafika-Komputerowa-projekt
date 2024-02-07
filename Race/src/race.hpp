@@ -83,18 +83,37 @@ Core::RenderContext place1Context;
 Core::RenderContext place2Context;
 Core::RenderContext place3Context;
 Core::RenderContext youContext;
+Core::RenderContext arrowContext;
 
 // Checkpoint positions
-const int numCheckpoints = 5;
+const int numCheckpoints = 14;
 std::vector<glm::vec3> checkpointPos = {
 	glm::vec3(0.0f, 1.0f, 4.0f),
-	glm::vec3(-12.5f, 1.0f, 10.5f),
-	glm::vec3(-6.5f, 1.0f, 25.5f),
-	glm::vec3(-3.5f, 1.0f, 43.5f),
-	glm::vec3(-6.5f, 1.0f, 54.0f),
+	glm::vec3(-5.5f, 1.0f, 12.5f),
+	glm::vec3(-10.0f, 1.0f, 20.5f),
+	glm::vec3(-5.0f, 1.0f, 26.0f),
+	glm::vec3(2.0f, 1.0f, 20.0f),
+	glm::vec3(1.0f, 1.0f, 13.0f),
+	glm::vec3(3.0f, 1.0f, 3.0f),
+	glm::vec3(0.0f, 1.0f, -6.0f),
+	glm::vec3(-2.0f, 1.0f, -12.0f),
+	glm::vec3(-5.0f, 1.0f, -10.0f),
+ 	glm::vec3(-9.0f, 1.0f, -5.0f),
+	glm::vec3(-11.0f, 1.0f, 2.0f),
+	glm::vec3(-6.0f, 1.0f, 8.0f),
+	glm::vec3(0.5f, 1.0f, 8.0f),
 	// Additional
-	glm::vec3(-6.5f, 1.0f, 60.0f),
-	glm::vec3(-6.5f, 1.0f, 100.0f)
+	glm::vec3(1.0f, 1.0f, 8.0f),
+	glm::vec3(2.0f, 1.0f, 8.0f)
+
+	//glm::vec3(0.0f, 1.0f, 4.0f),
+	//glm::vec3(-5.5f, 1.0f, 12.5f),
+	//glm::vec3(-6.5f, 1.0f, 18.5f),
+	//glm::vec3(-3.5f, 1.0f, 22.5f),
+	//glm::vec3(-0.5f, 1.0f, 18.5f),
+	//// Additional
+	//glm::vec3(-1.5f, 1.0f, 13.0f),
+	//glm::vec3(-1.5f, 1.0f, 10.0f)
 
 };
 
@@ -145,6 +164,24 @@ bool checkpointReached(int index, glm::vec3 playerPos) {
 	}
 	else
 	{
+		return false;
+	}
+}
+
+bool checkpointReached2(int index, glm::vec3 playerPos, const glm::mat4& checkpointRotationMatrix) {
+	// Obliczamy ró¿nicê miêdzy pozycj¹ gracza a pozycj¹ checkpointu
+	glm::vec3 diff = playerPos - checkpointPos[index];
+
+	// Przekszta³camy ró¿nicê do uk³adu wspó³rzêdnych checkpointu przez pomno¿enie przez odwrotnoœæ macierzy rotacji
+	glm::vec3 transformedDiff = glm::inverse(checkpointRotationMatrix) * glm::vec4(diff, 1.0f);
+
+	// Sprawdzamy, czy przetransformowana ró¿nica mieœci siê w zakresie odleg³oœci od checkpointu
+	if (transformedDiff.x >= -1.0f && transformedDiff.x <= 1.0f &&
+		transformedDiff.y >= -2.25f && transformedDiff.y <= 1.0f &&
+		transformedDiff.z >= -0.1f && transformedDiff.z <= 0.1f) {
+		return true;
+	}
+	else {
 		return false;
 	}
 }
@@ -234,7 +271,7 @@ glm::mat4 createPerspectiveMatrix()
 	return perspectiveMatrix;
 }
 
-void drawObjectColor(Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec3 color) {
+void drawObjectColor(Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec3 color, glm::vec3 lightPos) {
 
 	glUseProgram(program);
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
@@ -444,29 +481,37 @@ void renderScene(GLFWwindow* window)
 	// Checkpoint
 	drawObjectColor(checkpointContext,
 		glm::translate(checkpointPos[currentCheckpointIndex]) * calculateCheckpointRotationMatrix(checkpointPos[currentCheckpointIndex], checkpointPos[currentCheckpointIndex + 1]),
-		colors[colorIndex]
+		colors[colorIndex], lightPos
 	);
+	// Arrow
+	if (colorIndex != 1) {
+		drawObjectColor(arrowContext,
+			glm::translate(checkpointPos[currentCheckpointIndex]) * calculateCheckpointRotationMatrix(checkpointPos[currentCheckpointIndex], checkpointPos[currentCheckpointIndex + 1]),
+			colors[colorIndex], lightPos
+		);
+	}
 
 	// 1st place
 	drawObjectColor(place1Context,
 		glm::translate(glm::vec3(-100.f, -100.0f, -100.0f)),
-		glm::vec3(1.0, 1.0, 0.0)
+		glm::vec3(1.0, 1.0, 0.0), cameraPos
 	);
 	// 2nd place
 	drawObjectColor(place2Context,
 		glm::translate(glm::vec3(-100.f, -100.0f, -100.0f)),
-		glm::vec3(0.5, 0.5, 0.5)
+		glm::vec3(0.5, 0.5, 0.5), cameraPos
 	);
 	// 3rd place
 	drawObjectColor(place3Context,
 		glm::translate(glm::vec3(-100.f, -100.0f, -100.0f)),
-		glm::vec3(0.5, 0.2, 0.0)
+		glm::vec3(0.5, 0.2, 0.0), cameraPos
 	);
 	// You
 	drawObjectColor(youContext,
 		glm::translate(youPos) * BotCameraRotationMatrix(youDir),
-		glm::vec3(1.0, 1.0, 1.0)
+		glm::vec3(1.0, 1.0, 1.0), cameraPos
 	);
+
 
 	// Moon_Normal
 	drawObjectTextureNormal(sphereContext,
@@ -551,6 +596,7 @@ void init(GLFWwindow* window)
 	loadModelToContext("./models/second.obj", place2Context);
 	loadModelToContext("./models/third.obj", place3Context);
 	loadModelToContext("./models/you.obj", youContext);
+	loadModelToContext("./models/arrow.obj", arrowContext);
 
 	texture::earth = Core::LoadTexture("textures/earth.png");
 	texture::earth2 = Core::LoadTexture("textures/earth2.png");
@@ -631,19 +677,19 @@ void processInput(GLFWwindow* window)
 	}
 
 	// Checkpoint
-	if (checkpointReached(currentCheckpointIndex, spaceshipPos))
+	if (checkpointReached2(currentCheckpointIndex, spaceshipPos, calculateCheckpointRotationMatrix(checkpointPos[currentCheckpointIndex], checkpointPos[currentCheckpointIndex + 1])))
 	{
 		currentCheckpointIndex += 1;
 	}
 
-	if (currentCheckpointIndex == 4) {
+	if (currentCheckpointIndex == 13) {
 		colorIndex = 1;
 	}
 
 
 	// Finishing the race
-	if (checkpointReached(4, spaceshipPos) &&
-		currentCheckpointIndex == 5)
+	if (checkpointReached2(13, spaceshipPos, calculateCheckpointRotationMatrix(checkpointPos[currentCheckpointIndex], checkpointPos[currentCheckpointIndex + 1])) &&
+		currentCheckpointIndex == 14)
 	{
 		PlayerEnd = true;
 		// Teleport
@@ -693,6 +739,36 @@ void processInput(GLFWwindow* window)
 	//spaceshipPos = Bot1Pos;
 	//std::cout << "tBot1: " << tBot1 << ", " << "Time: " << raceStartTime << ")\n";
 
+	//if (tBot1 < 1.0f) {
+	//	Bot1Pos = CalculateCatmullRomSpline(tBot1, Bot1Spawn, Bot1Spawn, checkpointPos[0], checkpointPos[1]);
+	//	Bot1Dir = CalculateCatmullRomSplineDerivative(tBot1, Bot1Spawn, Bot1Spawn, checkpointPos[0], checkpointPos[1]);
+	//}
+	//else if (tBot1 < 2.0f) {
+	//	Bot1Pos = CalculateCatmullRomSpline(tBot1 - 1.0f, Bot1Spawn, checkpointPos[0], checkpointPos[1], checkpointPos[2]);
+	//	Bot1Dir = CalculateCatmullRomSplineDerivative(tBot1 - 1.0f, Bot1Spawn, checkpointPos[0], checkpointPos[1], checkpointPos[2]);
+	//}
+	//else if (tBot1 < 3.0f) {
+	//	Bot1Pos = CalculateCatmullRomSpline(tBot1 - 2.0f, checkpointPos[0], checkpointPos[1], checkpointPos[2], checkpointPos[3]);
+	//	Bot1Dir = CalculateCatmullRomSplineDerivative(tBot1 - 2.0f, checkpointPos[0], checkpointPos[1], checkpointPos[2], checkpointPos[3]);
+	//}
+	//else if (tBot1 < 4.0f) {
+	//	Bot1Pos = CalculateCatmullRomSpline(tBot1 - 3.0f, checkpointPos[1], checkpointPos[2], checkpointPos[3], checkpointPos[4]);
+	//	Bot1Dir = CalculateCatmullRomSplineDerivative(tBot1 - 3.0f, checkpointPos[1], checkpointPos[2], checkpointPos[3], checkpointPos[4]);
+	//}
+	//else if (tBot1 < 5.0f) {
+	//	Bot1Pos = CalculateCatmullRomSpline(tBot1 - 4.0f, checkpointPos[2], checkpointPos[3], checkpointPos[4], checkpointPos[5]);
+	//	Bot1Dir = CalculateCatmullRomSplineDerivative(tBot1 - 4.0f, checkpointPos[2], checkpointPos[3], checkpointPos[4], checkpointPos[5]);
+	//	if (checkpointReached2(4, Bot1Pos, calculateCheckpointRotationMatrix(checkpointPos[currentCheckpointIndex], checkpointPos[currentCheckpointIndex + 1])) && !(PlayerEnd == true)) {
+	//		Bot1End = true;
+	//		Bot1Pos = glm::vec3(-100.0f, -97.0f, -100.0f);
+	//		Bot1Dir = glm::vec3(0.0f, 0.0f, 1.0f);
+	//	}
+	//	else if (checkpointReached2(4, Bot1Pos, calculateCheckpointRotationMatrix(checkpointPos[currentCheckpointIndex], checkpointPos[currentCheckpointIndex + 1])) && (PlayerEnd == true)) {
+	//		Bot1Pos = glm::vec3(-102.2f, -97.5f, -100.0f);
+	//		Bot1Dir = glm::vec3(0.0f, 0.0f, 1.0f);
+	//	}
+	//}
+
 	if (tBot1 < 1.0f) {
 		Bot1Pos = CalculateCatmullRomSpline(tBot1, Bot1Spawn, Bot1Spawn, checkpointPos[0], checkpointPos[1]);
 		Bot1Dir = CalculateCatmullRomSplineDerivative(tBot1, Bot1Spawn, Bot1Spawn, checkpointPos[0], checkpointPos[1]);
@@ -700,29 +776,60 @@ void processInput(GLFWwindow* window)
 	else if (tBot1 < 2.0f) {
 		Bot1Pos = CalculateCatmullRomSpline(tBot1 - 1.0f, Bot1Spawn, checkpointPos[0], checkpointPos[1], checkpointPos[2]);
 		Bot1Dir = CalculateCatmullRomSplineDerivative(tBot1 - 1.0f, Bot1Spawn, checkpointPos[0], checkpointPos[1], checkpointPos[2]);
-	}
-	else if (tBot1 < 3.0f) {
-		Bot1Pos = CalculateCatmullRomSpline(tBot1 - 2.0f, checkpointPos[0], checkpointPos[1], checkpointPos[2], checkpointPos[3]);
-		Bot1Dir = CalculateCatmullRomSplineDerivative(tBot1 - 2.0f, checkpointPos[0], checkpointPos[1], checkpointPos[2], checkpointPos[3]);
-	}
-	else if (tBot1 < 4.0f) {
-		Bot1Pos = CalculateCatmullRomSpline(tBot1 - 3.0f, checkpointPos[1], checkpointPos[2], checkpointPos[3], checkpointPos[4]);
-		Bot1Dir = CalculateCatmullRomSplineDerivative(tBot1 - 3.0f, checkpointPos[1], checkpointPos[2], checkpointPos[3], checkpointPos[4]);
-	}
-	else if (tBot1 < 5.0f) {
-		Bot1Pos = CalculateCatmullRomSpline(tBot1 - 4.0f, checkpointPos[2], checkpointPos[3], checkpointPos[4], checkpointPos[5]);
-		Bot1Dir = CalculateCatmullRomSplineDerivative(tBot1 - 4.0f, checkpointPos[2], checkpointPos[3], checkpointPos[4], checkpointPos[5]);
-		if (checkpointReached(4, Bot1Pos) && !(PlayerEnd == true)) {
-			Bot1End = true;
-			Bot1Pos = glm::vec3(-100.0f, -97.0f, -100.0f);
-			Bot1Dir = glm::vec3(0.0f, 0.0f, 1.0f);
+	} else if (Bot1End == false) { 
+		for (float i = 0; i < 13; ++i) {
+			if (tBot1 < (i + 3)) {
+				Bot1Pos = CalculateCatmullRomSpline(tBot1 - 2 - i, checkpointPos[i], checkpointPos[i + 1], checkpointPos[i + 2], checkpointPos[i + 3]);
+				Bot1Dir = CalculateCatmullRomSplineDerivative(tBot1 - 2 - i, checkpointPos[i], checkpointPos[i + 1], checkpointPos[i + 2], checkpointPos[i + 3]);
+				break;
+			}
 		}
-		else if (checkpointReached(4, Bot1Pos) && (PlayerEnd == true)) {
-			Bot1Pos = glm::vec3(-102.2f, -97.5f, -100.0f);
-			Bot1Dir = glm::vec3(0.0f, 0.0f, 1.0f);
-		}
+	}
+	if (checkpointReached2(13, Bot1Pos, calculateCheckpointRotationMatrix(checkpointPos[13], checkpointPos[14])) && !(PlayerEnd == true)) {
+		Bot1End = true;
+		Bot1Pos = glm::vec3(-100.0f, -97.0f, -100.0f);
+		Bot1Dir = glm::vec3(0.0f, 0.0f, 1.0f);
+	}
+	else if (checkpointReached2(13, Bot1Pos, calculateCheckpointRotationMatrix(checkpointPos[13], checkpointPos[14])) && (PlayerEnd == true)) {
+		Bot1Pos = glm::vec3(-102.2f, -97.5f, -100.0f);
+		Bot1Dir = glm::vec3(0.0f, 0.0f, 1.0f);
 	}
 
+
+
+	//if (tBot2 < 1.0f) {
+	//	Bot2Pos = CalculateCatmullRomSpline(tBot2, Bot2Spawn, Bot2Spawn, Bot2Spawn, checkpointPos[0]);
+	//	Bot2Dir = CalculateCatmullRomSplineDerivative(tBot2, Bot2Spawn, Bot2Spawn, Bot2Spawn, checkpointPos[0]);
+	//}
+	//else if (tBot2 < 2.0f) {
+	//	Bot2Pos = CalculateCatmullRomSpline(tBot2 - 1.0f, Bot2Spawn, Bot2Spawn, checkpointPos[0], checkpointPos[1]);
+	//	Bot2Dir = CalculateCatmullRomSplineDerivative(tBot2 - 1.0f, Bot2Spawn, Bot2Spawn, checkpointPos[0], checkpointPos[1]);
+	//}
+	//else if (tBot2 < 3.0f) {
+	//	Bot2Pos = CalculateCatmullRomSpline(tBot2 - 2.0f, Bot2Spawn, checkpointPos[0], checkpointPos[1], checkpointPos[2]);
+	//	Bot2Dir = CalculateCatmullRomSplineDerivative(tBot2 - 2.0f, Bot2Spawn, checkpointPos[0], checkpointPos[1], checkpointPos[2]);
+	//}
+	//else if (tBot2 < 4.0f) {
+	//	Bot2Pos = CalculateCatmullRomSpline(tBot2 - 3.0f, checkpointPos[0], checkpointPos[1], checkpointPos[2], checkpointPos[3]);
+	//	Bot2Dir = CalculateCatmullRomSplineDerivative(tBot2 - 3.0f, checkpointPos[0], checkpointPos[1], checkpointPos[2], checkpointPos[3]);
+	//}
+	//else if (tBot2 < 5.0f) {
+	//	Bot2Pos = CalculateCatmullRomSpline(tBot2 - 4.0f, checkpointPos[1], checkpointPos[2], checkpointPos[3], checkpointPos[4]);
+	//	Bot2Dir = CalculateCatmullRomSplineDerivative(tBot2 - 4.0f, checkpointPos[1], checkpointPos[2], checkpointPos[3], checkpointPos[4]);
+	//}
+	//else if (tBot2 < 6.0f) {
+	//	Bot2Pos = CalculateCatmullRomSpline(tBot2 - 5.0f, checkpointPos[2], checkpointPos[3], checkpointPos[4], checkpointPos[5]);
+	//	Bot2Dir = CalculateCatmullRomSplineDerivative(tBot2 - 5.0f, checkpointPos[2], checkpointPos[3], checkpointPos[4], checkpointPos[5]);
+	//	if (checkpointReached2(4, Bot2Pos, calculateCheckpointRotationMatrix(checkpointPos[currentCheckpointIndex], checkpointPos[currentCheckpointIndex + 1])) && !(PlayerEnd == true)) {
+	//		Bot2End = true;
+	//		Bot2Pos = glm::vec3(-102.2f, -97.5f, -100.0f);
+	//		Bot2Dir = glm::vec3(0.0f, 0.0f, 1.0f);
+	//	}
+	//	else if (checkpointReached2(4, Bot2Pos, calculateCheckpointRotationMatrix(checkpointPos[currentCheckpointIndex], checkpointPos[currentCheckpointIndex + 1])) && (PlayerEnd == true)) {
+	//		Bot2Pos = glm::vec3(-97.8f, -98.0f, -100.0f);
+	//		Bot2Dir = glm::vec3(0.0f, 0.0f, 1.0f);
+	//	}
+	//}
 
 	if (tBot2 < 1.0f) {
 		Bot2Pos = CalculateCatmullRomSpline(tBot2, Bot2Spawn, Bot2Spawn, Bot2Spawn, checkpointPos[0]);
@@ -736,26 +843,23 @@ void processInput(GLFWwindow* window)
 		Bot2Pos = CalculateCatmullRomSpline(tBot2 - 2.0f, Bot2Spawn, checkpointPos[0], checkpointPos[1], checkpointPos[2]);
 		Bot2Dir = CalculateCatmullRomSplineDerivative(tBot2 - 2.0f, Bot2Spawn, checkpointPos[0], checkpointPos[1], checkpointPos[2]);
 	}
-	else if (tBot2 < 4.0f) {
-		Bot2Pos = CalculateCatmullRomSpline(tBot2 - 3.0f, checkpointPos[0], checkpointPos[1], checkpointPos[2], checkpointPos[3]);
-		Bot2Dir = CalculateCatmullRomSplineDerivative(tBot2 - 3.0f, checkpointPos[0], checkpointPos[1], checkpointPos[2], checkpointPos[3]);
-	}
-	else if (tBot2 < 5.0f) {
-		Bot2Pos = CalculateCatmullRomSpline(tBot2 - 4.0f, checkpointPos[1], checkpointPos[2], checkpointPos[3], checkpointPos[4]);
-		Bot2Dir = CalculateCatmullRomSplineDerivative(tBot2 - 4.0f, checkpointPos[1], checkpointPos[2], checkpointPos[3], checkpointPos[4]);
-	}
-	else if (tBot2 < 6.0f) {
-		Bot2Pos = CalculateCatmullRomSpline(tBot2 - 5.0f, checkpointPos[2], checkpointPos[3], checkpointPos[4], checkpointPos[5]);
-		Bot2Dir = CalculateCatmullRomSplineDerivative(tBot2 - 5.0f, checkpointPos[2], checkpointPos[3], checkpointPos[4], checkpointPos[5]);
-		if (checkpointReached(4, Bot2Pos) && !(PlayerEnd == true)) {
-			Bot2End = true;
-			Bot2Pos = glm::vec3(-102.2f, -97.5f, -100.0f);
-			Bot2Dir = glm::vec3(0.0f, 0.0f, 1.0f);
+	else if (Bot2End == false) {
+		for (float j = 0; j < 13; ++j) {
+			if (tBot2 < (j + 4)) {
+				Bot2Pos = CalculateCatmullRomSpline(tBot2 - 3 - j, checkpointPos[j], checkpointPos[j + 1], checkpointPos[j + 2], checkpointPos[j + 3]);
+				Bot2Dir = CalculateCatmullRomSplineDerivative(tBot2 - 3 - j, checkpointPos[j], checkpointPos[j + 1], checkpointPos[j + 2], checkpointPos[j + 3]);
+				break;
+			}
 		}
-		else if (checkpointReached(4, Bot2Pos) && (PlayerEnd == true)) {
-			Bot2Pos = glm::vec3(-97.8f, -98.0f, -100.0f);
-			Bot2Dir = glm::vec3(0.0f, 0.0f, 1.0f);
-		}
+	}
+	if (checkpointReached2(13, Bot2Pos, calculateCheckpointRotationMatrix(checkpointPos[13], checkpointPos[14])) && !(PlayerEnd == true)) {
+		Bot2End = true;
+		Bot2Pos = glm::vec3(-102.2f, -97.5f, -100.0f);
+		Bot2Dir = glm::vec3(0.0f, 0.0f, 1.0f);
+	}
+	else if (checkpointReached2(13, Bot2Pos, calculateCheckpointRotationMatrix(checkpointPos[13], checkpointPos[14])) && (PlayerEnd == true)) {
+		Bot2Pos = glm::vec3(-97.8f, -98.0f, -100.0f);
+		Bot2Dir = glm::vec3(0.0f, 0.0f, 1.0f);
 	}
 	
 
