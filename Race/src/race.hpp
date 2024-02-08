@@ -162,6 +162,7 @@ bool Bot2End = false;
 bool Bot1Endc = false;
 bool Bot2Endc = false;
 bool PlayerEnd = false;
+bool renderPlayer = false;
 float raceStartTime = 0.0f;
 float deltaTime;
 float lastFrameTime = 0.f;
@@ -323,6 +324,18 @@ void drawObjectColor(Core::RenderContext& context, glm::mat4 modelMatrix, glm::v
 
 }
 
+void drawObjectTexture(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureID) {
+	glUseProgram(programTex);
+	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
+	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
+	glUniformMatrix4fv(glGetUniformLocation(programTex, "transformation"), 1, GL_FALSE, (float*)&transformation);
+	glUniformMatrix4fv(glGetUniformLocation(programTex, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
+	glUniform3f(glGetUniformLocation(programTex, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+	Core::SetActiveTexture(textureID, "colorTexture", programTex, 0);
+	Core::DrawContext(context);
+
+}
+
 void drawObjectTextureNormal(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureID, GLuint normalmapId) {
 	glUseProgram(programTexNormal);
 
@@ -403,6 +416,20 @@ void drawEarth(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textu
 	Core::SetActiveTexture(textureID2, "clouds", programEarth, 2);
 
 	glUniform3f(glGetUniformLocation(programEarth, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+	Core::DrawContext(context);
+
+}
+
+void drawObjectProc(Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec3 color1, glm::vec3 color2) {
+
+	glUseProgram(programProcTex);
+	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
+	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
+	glUniformMatrix4fv(glGetUniformLocation(programProcTex, "transformation"), 1, GL_FALSE, (float*)&transformation);
+	glUniformMatrix4fv(glGetUniformLocation(programProcTex, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
+	glUniform3f(glGetUniformLocation(programProcTex, "color1"), color1.x, color1.y, color1.z);
+	glUniform3f(glGetUniformLocation(programProcTex, "color2"), color2.x, color2.y, color2.z);
+	glUniform3f(glGetUniformLocation(programProcTex, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 	Core::DrawContext(context);
 
 }
@@ -522,6 +549,9 @@ void renderPlanets(GLuint textureId, GLuint normalId, int x, float time) {
 	drawObjectTextureNormal(sphereContext, glm::translate(positions[x+1]) * glm::scale(glm::vec3(0.8f)), textureId, normalId);
 }
 
+bool explorationMode = false; // Flaga œledz¹ca, czy tryb eksploracji jest w³¹czony
+glm::mat4 spaceshipCameraRotationMatrix;
+
 void renderScene(GLFWwindow* window)
 {
 	glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
@@ -553,29 +583,32 @@ void renderScene(GLFWwindow* window)
 		texture::spaceship, texture::spaceship_normal
 	);
 
-	// Bot1
-	drawObjectShip(shipContext,
-		glm::translate(Bot1Pos) * BotCameraRotationMatrix(Bot1Dir) * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1)),
-		texture::spaceship, texture::spaceship_normal
-	);
+	// Bot1 and Bot2
+	if (!explorationMode) {
+		drawObjectShip(shipContext,
+			glm::translate(Bot1Pos) * BotCameraRotationMatrix(Bot1Dir) * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1)),
+			texture::spaceship, texture::spaceship_normal
+		);
 
-	// Bot2
-	drawObjectShip(shipContext,
-		glm::translate(Bot2Pos) * BotCameraRotationMatrix(Bot2Dir) * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1)),
-		texture::spaceship, texture::spaceship_normal
-	);
+		drawObjectShip(shipContext,
+			glm::translate(Bot2Pos) * BotCameraRotationMatrix(Bot2Dir) * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1)),
+			texture::spaceship, texture::spaceship_normal
+		);
+	}
 
 	// Checkpoint
-	drawObjectColor(checkpointContext,
-		glm::translate(checkpointPos[currentCheckpointIndex]) * calculateCheckpointRotationMatrix(checkpointPos[currentCheckpointIndex], checkpointPos[currentCheckpointIndex + 1]),
-		colors[colorIndex], lightPos
-	);
-	// Arrow
-	if (colorIndex != 1) {
-		drawObjectColor(arrowContext,
+	if (!explorationMode) {
+		drawObjectColor(checkpointContext,
 			glm::translate(checkpointPos[currentCheckpointIndex]) * calculateCheckpointRotationMatrix(checkpointPos[currentCheckpointIndex], checkpointPos[currentCheckpointIndex + 1]),
 			colors[colorIndex], lightPos
 		);
+		// Arrow
+		if (colorIndex != 1) {
+			drawObjectColor(arrowContext,
+				glm::translate(checkpointPos[currentCheckpointIndex]) * calculateCheckpointRotationMatrix(checkpointPos[currentCheckpointIndex], checkpointPos[currentCheckpointIndex + 1]),
+				colors[colorIndex], lightPos
+			);
+		}
 	}
 
 	// 1st place
@@ -776,6 +809,34 @@ void processInput(GLFWwindow* window)
 
 	float angleSpeed = 2.f / fps;
 	float moveSpeed = 4.5f / fps;
+
+	// W obs³udze klawisza B - teleportacja gracza na pocz¹tek trasy
+	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS && PlayerEnd) {
+		spaceshipPos = glm::vec3(0.0f, 1.000000f, -5.0f);
+		spaceshipDir = glm::vec3(0.0f, 0.000000f, 1.0f);
+		cameraPos = glm::vec3(-4.f, 0, 0);
+		cameraDir = glm::vec3(1.f, 0.f, 0.f);
+		// Ustaw flagê renderowania gracza
+		renderPlayer = true; // Dodaj zmienn¹ bool renderPlayer i ustaw j¹ na true
+		PlayerEnd = false; // Ustaw PlayerEnd na false, aby aktywowaæ obs³ugê poruszania siê statkiem
+		// Ukryj ostatni checkpoint
+		checkpointPos[14] = glm::vec3(9999.f, 9999.f, 9999.f); // Przesuñ checkpoint poza obszar widocznym
+	}
+
+	// W funkcji renderuj¹cej scenê
+	if (renderPlayer) {
+		drawObjectShip(shipContext,
+			glm::translate(spaceshipPos) * spaceshipCameraRotationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1)),
+			texture::spaceship, texture::spaceship_normal
+		);
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS)
+	{
+		explorationMode = !explorationMode; // Zmiana trybu eksploracji po naciœniêciu klawisza V
+		renderScene(window);
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
