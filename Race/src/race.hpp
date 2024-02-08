@@ -831,9 +831,15 @@ void processInput(GLFWwindow* window)
 		);
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
 	{
-		explorationMode = !explorationMode; // Zmiana trybu eksploracji po naciœniêciu klawisza V
+		explorationMode = true; // Zmiana na tryb eksploracji
+		renderScene(window);
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+	{
+		explorationMode = false; // Zmiana na tryb wyœcigu
 		renderScene(window);
 	}
 
