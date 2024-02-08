@@ -165,6 +165,8 @@ bool PlayerEnd = false;
 float raceStartTime = 0.0f;
 float deltaTime;
 float lastFrameTime = 0.f;
+float lastClickTime = 0.f;
+float timeCount = 0.f;
 
 glm::vec3 cameraPos = glm::vec3(-4.f, 0, 0);
 glm::vec3 cameraDir = glm::vec3(1.f, 0.f, 0.f);
@@ -766,6 +768,7 @@ void processInput(GLFWwindow* window)
 {
 	glm::vec3 spaceshipSide = glm::normalize(glm::cross(spaceshipDir, glm::vec3(0.f, 1.f, 0.f)));
 	glm::vec3 spaceshipUp = glm::vec3(0.f, 1.f, 0.f);
+	float equation = 1.f;
 	float time = glfwGetTime();
 	deltaTime = time - lastFrameTime;
 	lastFrameTime = time;
@@ -821,8 +824,19 @@ void processInput(GLFWwindow* window)
 
 	}
 	if (PlayerEnd == false) {
-		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 			spaceshipPos += spaceshipDir * moveSpeed;
+			if (time - lastClickTime < 0.01f) {
+				timeCount += time - lastClickTime;
+			}
+			equation = (1.f / 2.f * tanh(5.f * timeCount) + 1.f);
+			lastClickTime = time;
+		}
+		else {
+			if (time - lastClickTime >= 0.01f)
+				timeCount = 0;
+			equation = -1.f / 4 * (tanh(5.f * (time - lastClickTime) - 1.9f)) + 1.25f;
+		}
 		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 			spaceshipPos -= spaceshipDir * moveSpeed;
 		if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
@@ -838,7 +852,7 @@ void processInput(GLFWwindow* window)
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 			spaceshipDir = glm::vec3(glm::eulerAngleY(-angleSpeed) * glm::vec4(spaceshipDir, 0));
 		cameraPos = spaceshipPos - 2.0 * spaceshipDir + glm::vec3(0, 1, 0) * 0.5f;
-		cameraDir = spaceshipDir;
+		cameraDir = spaceshipDir * equation;
 	}
 
 	float tBot1 = (glfwGetTime() * 0.5f - 3.0f);
